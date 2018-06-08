@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/8.0.141"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.dataway.page.view.IndexController">
+    <children>
+        <Button fx:id="guideButton" layoutX="276.0" layoutY="47.0" mnemonicParsing="false" text="新建向导"/>
+        <Button fx:id="configurationButton" layoutX="451.0" layoutY="47.0" mnemonicParsing="false" text="配置"/>
+    </children>
+</AnchorPane>

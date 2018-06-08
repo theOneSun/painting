@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="995.0" prefWidth="1520.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="RuleSetController">
+    <children>
+        <VBox layoutX="317.0" layoutY="88.0" prefHeight="995.0" prefWidth="1520.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <Label prefHeight="50.0" prefWidth="1520.0" text="规则集" VBox.vgrow="ALWAYS">
+                    <font>
+                        <Font size="24.0" />
+                    </font>
+               <padding>
+                  <Insets left="50.0" />
+               </padding>
+                </Label>
+                <SplitPane dividerPositions="0.3004201680672269" prefHeight="945.0" prefWidth="1520.0" VBox.vgrow="ALWAYS">
+                    <items>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="945.0" prefWidth="400.0">
+                     <children>
+                        <VBox layoutX="176.0" layoutY="241.0" prefHeight="943.0" prefWidth="452.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                                      <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="280.0" spacing="10.0" VBox.vgrow="ALWAYS">
+                                          <children>
+                                              <Button alignment="CENTER" lineSpacing="5.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" text="+" HBox.hgrow="ALWAYS" />
+                                              <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" text="-" HBox.hgrow="ALWAYS" />
+                                              <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" text="c" HBox.hgrow="ALWAYS" />
+                                              <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" text="m" HBox.hgrow="ALWAYS" />
+                                              <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" text="u" HBox.hgrow="ALWAYS" />
+                                              <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" text="d" HBox.hgrow="ALWAYS" />
+                                          </children>
+                                 <padding>
+                                    <Insets left="50.0" />
+                                 </padding>
+                                      </HBox>
+                                      <TreeView fx:id="ruleSetTreeView" prefHeight="890.0" prefWidth="450.0">
+                                 <padding>
+                                    <Insets top="20.0" />
+                                 </padding>
+                              </TreeView>
+                           </children>
+                           <padding>
+                              <Insets top="10.0" />
+                           </padding>
+                        </VBox>
+                     </children>
+                        </AnchorPane>
+                        <AnchorPane fx:id="rightPane" minHeight="0.0" minWidth="0.0" prefHeight="943.0" prefWidth="1058.0">
+                            <!--<children>
+                                <GridPane layoutX="48.0" layoutY="27.0" prefHeight="80.0" prefWidth="377.0"
+                                          AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="85.0"
+                                          AnchorPane.topAnchor="10.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="174.0" minWidth="5.0"
+                                                           prefWidth="78.0"/>
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="443.0" minWidth="10.0"
+                                                           prefWidth="443.0"/>
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                    </rowConstraints>
+                                    <children>
+                                        <Label contentDisplay="CENTER" prefHeight="40.0" prefWidth="120.0" text="规则名称"/>
+                                        <Label prefHeight="40.0" prefWidth="226.0" text="生效关键字" GridPane.rowIndex="1"/>
+                                        <TextField prefHeight="30.0" prefWidth="300.0" GridPane.columnIndex="1"/>
+                                        <TextField prefHeight="30.0" prefWidth="300.0" GridPane.columnIndex="1"
+                                                   GridPane.rowIndex="1"/>
+                                    </children>
+                                </GridPane>
+                                <Line endX="500.0" layoutX="115.0" layoutY="134.0" startX="-100.0"
+                                      AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0"
+                                      AnchorPane.topAnchor="110.0"/>
+                                <AnchorPane layoutX="136.0" layoutY="299.0" prefHeight="524.0" prefWidth="472.0"
+                                            AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                            AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="130.0">
+                                    <children>
+                                        <TabPane layoutX="96.0" layoutY="76.0" prefHeight="524.0" prefWidth="664.0"
+                                                 tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0"
+                                                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                                                 AnchorPane.topAnchor="0.0">
+                                            <tabs>
+                                                <Tab text="常规">
+                                                    <content>
+                                                        <AnchorPane fx:id="normalPane" minHeight="0.0" minWidth="0.0"
+                                                                    prefHeight="180.0" prefWidth="200.0">
+                                                            <children>
+                                                                <GridPane layoutX="180.0" layoutY="153.0"
+                                                                          prefHeight="485.0" prefWidth="664.0"
+                                                                          AnchorPane.bottomAnchor="0.0"
+                                                                          AnchorPane.leftAnchor="0.0"
+                                                                          AnchorPane.rightAnchor="20.0"
+                                                                          AnchorPane.topAnchor="20.0">
+                                                                    <columnConstraints>
+                                                                        <ColumnConstraints hgrow="SOMETIMES"
+                                                                                           maxWidth="-Infinity"
+                                                                                           minWidth="10.0"
+                                                                                           percentWidth="20.0"
+                                                                                           prefWidth="120.0"/>
+                                                                        <ColumnConstraints hgrow="SOMETIMES"
+                                                                                           minWidth="10.0"
+                                                                                           percentWidth="5.0"
+                                                                                           prefWidth="50.0"/>
+                                                                        <ColumnConstraints hgrow="SOMETIMES"
+                                                                                           minWidth="10.0"
+                                                                                           percentWidth="10.0"
+                                                                                           prefWidth="60.0"/>
+                                                                        <ColumnConstraints hgrow="SOMETIMES"
+                                                                                           minWidth="10.0"
+                                                                                           percentWidth="10.0"
+                                                                                           prefWidth="60.0"/>
+                                                                        <ColumnConstraints hgrow="SOMETIMES"
+                                                                                           minWidth="10.0"
+                                                                                           percentWidth="22.0"
+                                                                                           prefWidth="100.0"/>
+                                                                        <ColumnConstraints hgrow="SOMETIMES"
+                                                                                           minWidth="10.0"
+                                                                                           percentWidth="11.0"
+                                                                                           prefWidth="40.0"/>
+                                                                        <ColumnConstraints hgrow="SOMETIMES"
+                                                                                           minWidth="10.0"
+                                                                                           percentWidth="8.0"
+                                                                                           prefWidth="30.0"/>
+                                                                        <ColumnConstraints hgrow="SOMETIMES"
+                                                                                           minWidth="10.0"
+                                                                                           percentWidth="7.0"
+                                                                                           prefWidth="30.0"/>
+                                                                        <ColumnConstraints hgrow="SOMETIMES"
+                                                                                           minWidth="10.0"
+                                                                                           percentWidth="7.0"
+                                                                                           prefWidth="20.0"/>
+                                                                    </columnConstraints>
+                                                                    <rowConstraints>
+                                                                        <RowConstraints maxHeight="30.0"
+                                                                                        minHeight="30.0"
+                                                                                        prefHeight="30.0"
+                                                                                        vgrow="SOMETIMES"/>
+                                                                    </rowConstraints>
+                                                                    <children>
+                                                                        <Label alignment="CENTER" prefHeight="30.0"
+                                                                               prefWidth="140.0" text="文件列名"/>
+                                                                        <Label alignment="CENTER" prefHeight="30.0"
+                                                                               prefWidth="50.0" text="统计"
+                                                                               GridPane.columnIndex="1"/>
+                                                                        <Label alignment="CENTER" prefHeight="30.0"
+                                                                               prefWidth="62.0" text="最大值"
+                                                                               GridPane.columnIndex="2"/>
+                                                                        <Label alignment="CENTER" prefHeight="30.0"
+                                                                               prefWidth="62.0" text="最小值"
+                                                                               GridPane.columnIndex="3"/>
+                                                                        <Label alignment="CENTER" prefHeight="30.0"
+                                                                               prefWidth="156.0" text="数据校验值"
+                                                                               GridPane.columnIndex="4"/>
+                                                                        <Label alignment="CENTER" prefHeight="38.0"
+                                                                               prefWidth="68.0" text="取TOP值"
+                                                                               GridPane.columnIndex="5"/>
+                                                                        <Button mnemonicParsing="false"
+                                                                                prefHeight="30.0" prefWidth="50.0"
+                                                                                text="+" GridPane.columnIndex="8"/>
+                                                                        <Button mnemonicParsing="false"
+                                                                                prefHeight="46.0" prefWidth="81.0"
+                                                                                text="u" GridPane.columnIndex="6"/>
+                                                                        <Button mnemonicParsing="false"
+                                                                                prefHeight="30.0" prefWidth="50.0"
+                                                                                text="d" GridPane.columnIndex="7"/>
+                                                                    </children>
+                                                                </GridPane>
+                                                            </children>
+                                                        </AnchorPane>
+                                                    </content>
+                                                </Tab>
+                                                <Tab text="交叉">
+                                                    <content>
+                                                        <AnchorPane fx:id="crossPane" minHeight="0.0" minWidth="0.0"
+                                                                    prefHeight="180.0" prefWidth="200.0">
+                                                            <children>
+                                                                <GridPane layoutX="132.0" layoutY="107.0"
+                                                                          prefHeight="485.0" prefWidth="664.0"
+                                                                          AnchorPane.bottomAnchor="10.0"
+                                                                          AnchorPane.leftAnchor="0.0"
+                                                                          AnchorPane.rightAnchor="10.0"
+                                                                          AnchorPane.topAnchor="20.0">
+                                                                    <columnConstraints>
+                                                                        <ColumnConstraints hgrow="SOMETIMES"
+                                                                                           minWidth="10.0"
+                                                                                           prefWidth="100.0"/>
+                                                                        <ColumnConstraints hgrow="SOMETIMES"
+                                                                                           minWidth="10.0"
+                                                                                           prefWidth="100.0"/>
+                                                                        <ColumnConstraints hgrow="SOMETIMES"
+                                                                                           minWidth="10.0"
+                                                                                           prefWidth="100.0"/>
+                                                                        <ColumnConstraints hgrow="SOMETIMES"
+                                                                                           minWidth="10.0"
+                                                                                           prefWidth="100.0"/>
+                                                                    </columnConstraints>
+                                                                    <rowConstraints>
+                                                                        <RowConstraints maxHeight="30.0"
+                                                                                        minHeight="10.0"
+                                                                                        prefHeight="30.0"
+                                                                                        vgrow="SOMETIMES"/>
+                                                                    </rowConstraints>
+                                                                    <children>
+                                                                        <Label alignment="CENTER" prefHeight="30.0"
+                                                                               prefWidth="164.0" text="交叉项1"/>
+                                                                        <Label alignment="CENTER" prefHeight="30.0"
+                                                                               prefWidth="164.0" text="交叉项2"
+                                                                               GridPane.columnIndex="1"/>
+                                                                        <Label alignment="CENTER" prefHeight="30.0"
+                                                                               prefWidth="164.0" text="交叉项3"
+                                                                               GridPane.columnIndex="2"/>
+                                                                        <Label alignment="CENTER" prefHeight="30.0"
+                                                                               prefWidth="164.0" text="交叉最大比例"
+                                                                               GridPane.columnIndex="3"/>
+                                                                    </children>
+                                                                </GridPane>
+                                                            </children>
+                                                        </AnchorPane>
+                                                    </content>
+                                                </Tab>
+                                                <Tab text="新增列">
+                                                    <content>
+                                                        <AnchorPane fx:id="addColumnPane" minHeight="0.0" minWidth="0.0"
+                                                                    prefHeight="180.0" prefWidth="200.0"/>
+                                                    </content>
+                                                </Tab>
+                                            </tabs>
+                                        </TabPane>
+                                    </children>
+                                </AnchorPane>
+                            </children>-->
+                        </AnchorPane>
+                    </items>
+                </SplitPane>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

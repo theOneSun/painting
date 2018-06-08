@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.dataway.page.view.ConfigurationController">
+   <VBox layoutX="121.0" layoutY="141.0" prefHeight="768.0" prefWidth="1366.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <children>
+          <HBox fx:id="hBox" prefHeight="60.0" prefWidth="1366.0" VBox.vgrow="ALWAYS">
+              <children>
+                  <Button fx:id="delButton" maxHeight="60.0" mnemonicParsing="false" prefHeight="60.0" prefWidth="60.0" />
+                  <Button fx:id="bigButton" maxHeight="60.0" mnemonicParsing="false" prefHeight="60.0" prefWidth="60.0" />
+              </children>
+          </HBox>
+         <AnchorPane prefHeight="708.0" prefWidth="1366.0" VBox.vgrow="ALWAYS">
+            <children>
+               <SplitPane dividerPositions="0.29797979797979796" prefHeight="708.0" prefWidth="1366.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                 <items>
+                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                        <children>
+                           <VBox layoutX="165.0" layoutY="212.0" prefHeight="706.0" prefWidth="402.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <children>
+                                 <HBox alignment="CENTER" prefHeight="77.0" prefWidth="402.0" spacing="15.0" VBox.vgrow="ALWAYS">
+                                    <children>
+                                       <TextField fx:id="searchTextField" prefHeight="88.0" prefWidth="297.0" />
+                                       <Button fx:id="catalogSearchButton" mnemonicParsing="false" prefHeight="46.0" prefWidth="82.0" text="搜索" />
+                                    </children>
+                                 </HBox>
+                                 <ListView fx:id="setOptionList" onMouseClicked="#onMouseClicked" prefHeight="633.0" prefWidth="402.0" VBox.vgrow="ALWAYS" />
+                              </children>
+                           </VBox>
+                        </children>
+                     </AnchorPane>
+
+                   <AnchorPane fx:id="splitRightPane" minHeight="0.0" minWidth="0.0" prefHeight="706.0" prefWidth="954.0">
+                       <!--<children>
+                            <AnchorPane fx:id="splitRightPane" minHeight="0.0" minWidth="0.0" prefHeight="706.0" prefWidth="954.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                &lt;!&ndash;<fx:include  source="Common.fxml"/>&ndash;&gt;
+                            </AnchorPane>
+                           &lt;!&ndash;<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="706.0" prefWidth="954.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">&ndash;&gt;
+                               &lt;!&ndash;&lt;!&ndash;规则集&ndash;&gt;&ndash;&gt;
+                               &lt;!&ndash;&lt;!&ndash;<fx:include fx:id="ruleSet" source="Common.fxml"/>&ndash;&gt;&ndash;&gt;
+                           &lt;!&ndash;</AnchorPane>&ndash;&gt;
+                           &lt;!&ndash;<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="706.0" prefWidth="954.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">&ndash;&gt;
+                               &lt;!&ndash;&lt;!&ndash;支持库&ndash;&gt;&ndash;&gt;
+                               &lt;!&ndash;&lt;!&ndash;<fx:include fx:id="common" source="Common.fxml"/>&ndash;&gt;&ndash;&gt;
+                           &lt;!&ndash;</AnchorPane>&ndash;&gt;
+                       </children>-->
+                   </AnchorPane>
+                 </items>
+               </SplitPane>
+            </children>
+         </AnchorPane>
+      </children>
+   </VBox>
+</AnchorPane>
