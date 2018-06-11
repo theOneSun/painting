@@ -2,12 +2,15 @@ package com.dataway.page.view.guide
 
 import com.dataway.page.primaryStageName
 import com.dataway.page.view.selfdefine.StageManager
+import javafx.collections.FXCollections
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
 import javafx.scene.Scene
 import javafx.scene.control.Button
+import javafx.scene.control.ChoiceBox
 import javafx.scene.layout.AnchorPane
+import java.awt.Choice
 import java.net.URL
 import java.util.ResourceBundle
 
@@ -20,6 +23,8 @@ class AddRuleSetController : Initializable {
     private lateinit var nextButton: Button
     @FXML
     private lateinit var cancelButton: Button
+    @FXML
+    private lateinit var ruleSetChoiceBox: ChoiceBox<String>
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         //下一步按钮
@@ -50,5 +55,8 @@ class AddRuleSetController : Initializable {
             primaryStage?.scene = scene
 //            primaryStage?.close()
         }
+
+        //规则集choiceBox
+        ruleSetChoiceBox.items = FXCollections.observableArrayList("商业地产规则集")
     }
 }
