@@ -102,7 +102,6 @@ class AddFileController : Initializable {
         val nameColumn = TableColumn<FileData, String>("name")
         nameColumn.prefWidth = 600.0
         nameColumn.cellValueFactory = PropertyValueFactory("name")
-        nameColumn.cellValueFactory = PropertyValueFactory("name")
 
         val pathColumn = TableColumn<FileData, String>("where")
         pathColumn.prefWidth = 750.0
