@@ -3,8 +3,6 @@ package com.dataway.page.view.guide
 import com.dataway.page.model.SupportLibrary
 import com.dataway.page.primaryStageName
 import com.dataway.page.view.selfdefine.StageManager
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.fxml.FXML
@@ -14,13 +12,10 @@ import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.control.CheckBox
 import javafx.scene.control.ChoiceBox
-import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
-import javafx.scene.control.cell.CheckBoxTableCell
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.layout.AnchorPane
-import javafx.util.StringConverter
 import java.net.URL
 import java.util.ResourceBundle
 
@@ -90,13 +85,14 @@ class AddRuleSetController : Initializable {
         nameColumn.cellValueFactory = PropertyValueFactory("name")
 
 
-        val existColumn = TableColumn<SupportLibrary, Boolean>("是否拥有")
+        val existColumn = TableColumn<SupportLibrary, CheckBox>("是否拥有")
         existColumn.prefWidth = 80.0
-        existColumn.cellValueFactory = PropertyValueFactory("exist")
-        existColumn.cellFactory = CheckBoxTableCell.forTableColumn(existColumn)
+//        existColumn.cellValueFactory = PropertyValueFactory("exist")
+        existColumn.cellValueFactory = PropertyValueFactory("existCheckBox")
+//        existColumn.cellFactory = CheckBoxTableCell.forTableColumn(existColumn)
 
         supportLibraryTable.columns.addAll(nameColumn, existColumn)
-        supportLibraryTable.isEditable = true
+        supportLibraryTable.isEditable = false
         supportLibraryTable.items.addAll(needSupportLibraryList)
     }
 
@@ -104,12 +100,17 @@ class AddRuleSetController : Initializable {
 
     }
 
-    private fun getTrueCheckBox():CheckBox{
+    private fun getTrueCheckBox(): CheckBox {
         println("要添加复选框了")
         val checkBox = CheckBox()
         checkBox.prefWidth = 80.0
-        checkBox.isIndeterminate = true
+//        checkBox.isIndeterminate = true
         checkBox.isSelected = true
+        /*checkBox.selectedProperty().addListener(
+                { _, _, _ ->
+                    println("复选框的状态是:${checkBox.isSelected}")
+                }
+        )*/
         return checkBox
     }
 
