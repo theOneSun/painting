@@ -75,6 +75,7 @@ class FilePreHandleController : Initializable {
         //获取预处理的文件集合,调用处理方法
         val fileList = LeoContext.getValue(HANDLE_FILE) as MutableList<File>
         //todo 调用处理的方法
+
         // 初始化gridPane
         val nameColumn = ColumnConstraints()
         nameColumn.percentWidth = 30.0
@@ -115,7 +116,6 @@ class FilePreHandleController : Initializable {
                 preHandleGridPane.add(statusLabel("未处理","handleStatus$i"),1,i+1)
                 preHandleGridPane.add(pathLabel(fileList[i].path),2,i+1)
                 preHandleGridPane.add(getProgressBar(),3,i+1)
-
             }
         }
 
@@ -149,7 +149,7 @@ class FilePreHandleController : Initializable {
     }
 
     private fun getProgressBar():ProgressBar{
-        val progressBar = ProgressBar()
+        val progressBar = ProgressBar(0.0)
         progressBar.prefWidth = 354.0
         return progressBar
     }
