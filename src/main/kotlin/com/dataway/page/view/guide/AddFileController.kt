@@ -1,8 +1,10 @@
 package com.dataway.page.view.guide
 
 import com.dataway.page.model.FileData
-import com.dataway.page.primaryStageName
+import com.dataway.page.view.selfdefine.HANDLE_FILE
+import com.dataway.page.view.selfdefine.LeoContext
 import com.dataway.page.view.selfdefine.StageManager
+import com.dataway.page.view.selfdefine.primaryStageName
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
@@ -67,6 +69,8 @@ class AddFileController : Initializable {
         //下一步按钮
         nextButton.setOnAction {
             run {
+                //保存fileList
+                LeoContext.save(HANDLE_FILE,fileList)
                 // 跳到添加规则集页面
                 println("下一步跳到添加规则集")
                 val primaryStage = StageManager.getStageByName(primaryStageName)

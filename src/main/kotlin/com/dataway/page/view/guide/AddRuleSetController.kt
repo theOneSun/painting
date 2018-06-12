@@ -1,8 +1,8 @@
 package com.dataway.page.view.guide
 
 import com.dataway.page.model.SupportLibrary
-import com.dataway.page.primaryStageName
 import com.dataway.page.view.selfdefine.StageManager
+import com.dataway.page.view.selfdefine.primaryStageName
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.fxml.FXML

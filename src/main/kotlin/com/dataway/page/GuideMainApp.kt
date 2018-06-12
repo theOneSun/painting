@@ -1,6 +1,7 @@
 package com.dataway.page
 
 import com.dataway.page.view.selfdefine.StageManager
+import com.dataway.page.view.selfdefine.primaryStageName
 import javafx.application.Application
 import javafx.fxml.FXMLLoader
 import javafx.scene.Scene
@@ -23,13 +24,13 @@ class GuideMainApp: Application() {
             val scene = Scene(rootLayout)
             primaryStage?.scene= scene
             primaryStage?.show()
-            primaryStage.let { StageManager.saveStage("primaryStage",it!!) }
+            primaryStage.let { StageManager.saveStage(primaryStageName,it!!) }
         } catch (e: IOException) {
             e.printStackTrace()
         }
     }
 }
-const val primaryStageName = "primaryStage"
+
 
 fun main(args: Array<String>) {
     Application.launch(GuideMainApp::class.java,*args)

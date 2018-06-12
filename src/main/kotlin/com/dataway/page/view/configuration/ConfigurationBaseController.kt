@@ -1,7 +1,7 @@
 package com.dataway.page.view.configuration
 
-import com.dataway.page.primaryStageName
 import com.dataway.page.view.selfdefine.StageManager
+import com.dataway.page.view.selfdefine.primaryStageName
 import javafx.collections.FXCollections
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
