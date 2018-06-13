@@ -44,21 +44,27 @@ class ProgressBarDemoApp : Application() {
             textFlow.prefWidth = 200.0
             val timeText = Text("0")
             val percentText = Text("%")
-            textFlow.children.addAll(timeText,percentText)
+            textFlow.children.addAll(timeText, percentText)
 
-            anchorPane.children.addAll(progressBar, label,textFlow)
+            anchorPane.children.addAll(progressBar, label, textFlow)
 
             // 进度控制
             val progressTask = ProgressTask()
             progressBar.progressProperty().bind(progressTask.progressProperty())
             progressBar.progressProperty().addListener { observable, oldValue, newValue ->
-                timeText.text = ((newValue.toDouble()*100).toString())
+                println("newValue是:$newValue")
+                timeText.text = ((newValue.toDouble() * 100).toString())
             }
 //            label.textProperty().bind(Bindings.createStringBinding())
             //todo 改变数值,监听数值,100%后在改变label的值
             timeText.textProperty().addListener { observable, oldValue, newValue ->
-                if (newValue.toDouble() == 100.0){
-                    label.text = "已完成"
+                when {
+                    newValue.toDouble() == 0.0 -> {
+                    }
+                    newValue.toDouble() == 100.0 -> {
+                        label.text = "已完成"
+                    }
+                    else -> label.text = "处理中"
                 }
             }
 
@@ -66,6 +72,8 @@ class ProgressBarDemoApp : Application() {
 
             // Show the scene containing the root layout.
             val scene = Scene(anchorPane, 500.0, 500.0)
+            primaryStage.x = 1800.0
+            primaryStage.y = 500.0
             primaryStage.scene = scene
             primaryStage.show()
             StageManager.saveStage(primaryStageName, primaryStage)
