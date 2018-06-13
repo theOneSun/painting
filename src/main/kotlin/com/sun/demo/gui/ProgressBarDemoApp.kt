@@ -67,6 +67,8 @@ class ProgressBarDemoApp : Application() {
                     else -> label.text = "处理中"
                 }
             }
+            //测试运行结束隐藏进度条
+            progressBar.visibleProperty().bind(progressTask.runningProperty())
 
             Thread(progressTask).start()
 
