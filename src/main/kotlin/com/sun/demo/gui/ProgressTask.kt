@@ -6,9 +6,13 @@ import javafx.scene.control.Label
 /**
  * @author sunjian.
  */
-class ProgressTask : Task<String>() {
-    private val fileLength = 1345256
-    var perRead = 1
+class ProgressTask(private val fileLength:Int, private val perRead:Int) : Task<String>() {
+//    private val fileLength = 1345256
+//    private var perRead = 1
+
+
+
+
     override fun call(): String {
         var i = 0
         while (i <= fileLength) {

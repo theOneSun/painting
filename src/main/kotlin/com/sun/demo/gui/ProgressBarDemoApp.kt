@@ -49,7 +49,7 @@ class ProgressBarDemoApp : Application() {
             anchorPane.children.addAll(progressBar, label, textFlow)
 
             // 进度控制
-            val progressTask = ProgressTask()
+            val progressTask = ProgressTask(1345256,1)
             progressBar.progressProperty().bind(progressTask.progressProperty())
             progressBar.progressProperty().addListener { observable, oldValue, newValue ->
                 println("newValue是:$newValue")
