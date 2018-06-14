@@ -14,12 +14,14 @@ const val primaryStageName = "primaryStage"
  * 要处理的文件
  */
 const val HANDLE_FILE = "HANDLE_FILE"
+/**
+ * 生成文件的存放目录的key
+ */
+const val TARGET_DIR = "targetDir"
 //--------------end------------------
 
 //-------文件处理状态begin-----------
 const val FILE_HANDLE_FINISH = "已完成"
 const val FILE_HANDLE_READY = "未处理"
 const val FILE_HANDLE_ING = "处理中"
-
-
 //-------文件处理状态end-----------

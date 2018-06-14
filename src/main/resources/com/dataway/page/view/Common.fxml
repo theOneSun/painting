@@ -35,7 +35,7 @@
                         <Font size="18.0" />
                      </font>
                   </Label>
-                  <TextField prefHeight="40.0" prefWidth="1000.0" />
+                  <TextField fx:id="targetDirTextField" prefHeight="40.0" prefWidth="1000.0" />
                </children>
             </HBox>
             <Separator prefWidth="1520.0" />
