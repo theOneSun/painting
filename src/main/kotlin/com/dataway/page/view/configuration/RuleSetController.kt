@@ -1,5 +1,7 @@
 import com.dataway.page.ConfigurationMainApp
 import com.dataway.page.util.PropsUtils
+import com.dataway.page.view.selfdefine.LeoContext
+import com.dataway.page.view.selfdefine.SELECTED_RULESET
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
@@ -73,7 +75,7 @@ class RuleSetController : Initializable {
         // 不显示根节点
         ruleSetTreeView.isShowRoot = false
         // --------------------------------------------------------------
-        // todo 监测所有规则集配置文件
+        // todo 检测所有规则集配置文件
         val projectPath = System.getProperty("user.dir")
         println("项目路径$projectPath")
         val ruleSetFileList = File("$projectPath/conf").listFiles({ _, name ->
@@ -102,28 +104,35 @@ class RuleSetController : Initializable {
             abstractRoot.children.add(ruleSetRoot)
         }
 
-        ruleSetTreeView.selectionModel.selectedItemProperty().addListener({ observer, _, _ ->
+        // 选中节点改变事件
+        /*ruleSetTreeView.selectionModel.selectedItemProperty().addListener({ observer, _, _ ->
             run {
                 println("选中的节点是:$observer")
                 val loader = FXMLLoader()
-                /*val fxmlUrl = if (observer.value.isLeaf) {
-                    //todo
-                    println("go leaf Pane")
-                    "/com/dataway/page/view/RuleSetChildNode.fxml"
+
+                val fxmlUrl:String
+                val selectedKey:String
+                if (ruleSetNodeList.contains(observer.value)) {
+                    fxmlUrl = "/com/dataway/page/view/RuleSetParentNode.fxml"
+                    selectedKey = SELECTED_RULESET
                 } else {
-                    println("go parent Pane")
-                    "/com/dataway/page/view/RuleSetParentNode.fxml"
-                }*/
-                val fxmlUrl = if (ruleSetNodeList.contains(observer.value)) {
-                    "/com/dataway/page/view/RuleSetParentNode.fxml"
-                } else {
-                    "/com/dataway/page/view/RuleSetChildNode.fxml"
+                    fxmlUrl = "/com/dataway/page/view/RuleSetChildNode.fxml"
+                    selectedKey = SELECTED_RULESET
                 }
+                LeoContext.save(selectedKey,observer.value.value)
+
                 loader.location = javaClass.getResource(fxmlUrl)
                 val wantedPane: AnchorPane = loader.load()
                 rightPane.children.also { it.clear();it.add(wantedPane) }
             }
-        })
+        })*/
+
+        // 树操作
+        ruleSetTreeView.setOnMouseClicked { event ->
+            // todo 添加右键操作
+        }
+
+
 
         //todo 初始化按钮事件
         addButton.setOnMouseClicked {
@@ -173,7 +182,9 @@ class RuleSetController : Initializable {
         println("添加")
     }
 
-    //获取规则名称
+    /**
+     * 获取规则名称
+     */
     private fun getRuleName(props: Props):LinkedHashSet<String> {
         val resultSet = LinkedHashSet<String>()
         val allRule = PropsUtils.getMapByPrefix(props, "file")

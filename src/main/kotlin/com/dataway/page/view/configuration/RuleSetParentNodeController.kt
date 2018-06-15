@@ -1,11 +1,14 @@
 package com.dataway.page.view.configuration
 
+import com.dataway.page.view.selfdefine.LeoContext
+import com.dataway.page.view.selfdefine.SELECTED_RULESET
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.scene.control.Button
 import javafx.scene.control.ChoiceBox
 import javafx.scene.control.Label
 import javafx.scene.control.ListView
+import javafx.scene.control.TextField
 import javafx.scene.layout.ColumnConstraints
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.RowConstraints
@@ -26,17 +29,26 @@ class RuleSetParentNodeController : Initializable {
     private lateinit var verifyRuleChoiceBox: ChoiceBox<String>
     @FXML
     private lateinit var supportListView: ListView<String>
+    @FXML
+    private lateinit var ruleSetNameTextField:TextField
+    @FXML
+    private lateinit var verifyColumnTextField:TextField
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
+        //名称
+        ruleSetNameTextField.text = LeoContext.getValue(SELECTED_RULESET) as String?
+        //todo 验证列名(根据规则集名称查询其验证列名)
+        //todo 验证规则:根据规则集名称查询其验证规则 --choiceBox初始化
+
+
         //todo gridPane初始化
         showVerifyGridPane()
 
-        //todo 支持库listView初始化
-
-        //todo 验证规则choiceBox初始化
+        //todo 支持库listView初始化 根据规则集名称查询其支持库
 
 
-        loopAdd()
+
+        //loopAdd()
 
     }
 
