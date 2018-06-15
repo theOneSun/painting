@@ -30,12 +30,12 @@
                            <children>
                                       <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="280.0" spacing="10.0" VBox.vgrow="ALWAYS">
                                           <children>
-                                              <Button alignment="CENTER" lineSpacing="5.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" text="+" HBox.hgrow="ALWAYS" />
-                                              <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" text="-" HBox.hgrow="ALWAYS" />
-                                              <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" text="c" HBox.hgrow="ALWAYS" />
-                                              <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" text="m" HBox.hgrow="ALWAYS" />
-                                              <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" text="u" HBox.hgrow="ALWAYS" />
-                                              <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" text="d" HBox.hgrow="ALWAYS" />
+                                              <Button fx:id="addButton" alignment="CENTER" lineSpacing="5.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" text="+" HBox.hgrow="ALWAYS" />
+                                              <Button fx:id="deleteButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" text="-" HBox.hgrow="ALWAYS" />
+                                              <Button fx:id="copyButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" text="c" HBox.hgrow="ALWAYS" />
+                                              <Button fx:id="moveButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" text="m" HBox.hgrow="ALWAYS" />
+                                              <Button fx:id="syncButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" text="u" HBox.hgrow="ALWAYS" />
+                                              <Button fx:id="downloadButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" text="d" HBox.hgrow="ALWAYS" />
                                           </children>
                                  <padding>
                                     <Insets left="50.0" />

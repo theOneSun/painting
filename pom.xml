@@ -24,6 +24,7 @@
         <java.version>1.8</java.version>
         <kotlin.version>1.2.41</kotlin.version>
         <lombok.version>1.16.20</lombok.version>
+        <jodd.version>4.3.2</jodd.version>
     </properties>
 
     <dependencies>
@@ -62,7 +63,16 @@
             <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.jodd</groupId>
+            <artifactId>jodd-bean</artifactId>
+            <version>${jodd.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jodd</groupId>
+            <artifactId>jodd-props</artifactId>
+            <version>${jodd.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

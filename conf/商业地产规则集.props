@@ -1,0 +1,67 @@
+# 【基本配置】
+[leo]
+# 源文件目录
+sourceDir=${user.dir}/leo-work/source
+# 输出文件目录
+targetDir=${user.dir}/leo-work/target
+# 添加列匹配规则文件目录, 源文件名.rule.csv
+ruleDir=${user.dir}/leo-work/rule
+# 无效值
+invalidValues=NULL
+# 联合样本量以及列值总和校验的文件
+crossCheckFiles=基本属性
+# 列值总和校验的列名(列：访问次数)
+crossSumColumn=人数
+# 是否生成完成修复的文件
+outputRepairedFiles=true
+# 是否忽略配置文件中配置的列名
+ignoreConfigColumns=false
+
+# 【气泡图配置】
+[scatter]
+# 文件A(表3)
+filePathA=
+# 文件B(表1)
+filePathB=
+# 用于分组的列A(列：app名称)
+groupColumnA=
+# 用于分组的列B(可选)
+groupColumnB=
+# 文件A->人数列名
+peopleNumColumnA=人数
+# 文件B->人数列名
+peopleNumColumnB=人数
+# 次数列名
+timesNumColumnA=次数
+# 渗透率TOP
+topNum=50
+
+# 【每个文件的规则配置】
+[file.APP和wap使用习惯]
+columnNames=人群,高价值,资产指数,消费指数,养生关注,老人健康关注,儿童健康关注,区域,城市级别,地市,性别,年龄,手机品牌,一级类别,二级类别,APP,NO1,NO2,访问人数
+
+[file.基本属性]
+# 列名
+columnNames=人群,高价值,资产指数,消费指数,养生关注,老人健康关注,儿童健康关注,区域,省份,城市级别,地市,性别,年龄,操作系统,手机品牌,手机型号,人数
+# 列值
+columnValues.人群=d1,d2
+# 包含列
+includeColumns=
+# 排除列
+excludeColumns=手机品牌,手机型号
+# 列比例检查
+checkMaxScale.人群=30
+checkMinScale.人群=1
+# 交叉统计
+crossColumns.group1=人群,性别
+# 交叉统计检查
+crossCheckMinScale.group1=20
+crossCheckMaxScale.group1=20
+# 取 top
+topColumns.人群=2
+# 提取列
+extractColumn=人群
+# 关系-力图
+graphForceColumns.g1=Test,性别,人群
+# 关系-弦图
+graphCircularColumns.g1=性别,人群

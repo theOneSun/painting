@@ -2,6 +2,7 @@ package com.dataway.page.view.configuration
 
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
+import javafx.scene.control.Button
 import javafx.scene.control.ChoiceBox
 import javafx.scene.control.Label
 import javafx.scene.control.ListView
@@ -35,19 +36,35 @@ class RuleSetParentNodeController : Initializable {
         //todo 验证规则choiceBox初始化
 
 
-//        loopAdd()
+        loopAdd()
 
     }
 
     private fun loopAdd() {
-        for (i in 3 until 20) {
+        var ruleList = ArrayList<String>()
+        for (i in 3..20){
+            ruleList.add("验证规则$i")
+        }
+
+        for (i in ruleList.indices) {
             val rowConstraints = RowConstraints(40.0)
+
             verifyGridPane.rowConstraints.add(rowConstraints)
-            val label = Label("电视剧使用习惯$i")
+            val label = Label("电视剧使用习惯${i+3}")
             label.prefHeight = 36.0
             label.prefWidth = 198.0
 
-            verifyGridPane.add(label, 1, i)
+            val button =  Button("D")
+            button.id = "delete${i+3}"
+            button.setOnMouseClicked {
+                println("删除这行")
+//                verifyGridPane.rowConstraints.removeAt(i+3)
+                ruleList.remove(ruleList[i])
+                verifyGridPane.rowConstraints.clear()
+                loopAdd()
+            }
+            verifyGridPane.add(label, 1, i+3)
+            verifyGridPane.add(button,2,i+3)
         }
     }
 
