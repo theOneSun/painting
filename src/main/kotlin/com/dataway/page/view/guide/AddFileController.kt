@@ -44,7 +44,7 @@ class AddFileController : Initializable {
     /**
      * 转换的可以显示的文件对象
      */
-    private var fileDataList:MutableList<FileData> = arrayListOf()
+    private var fileDataList: MutableList<FileData> = arrayListOf()
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
 
@@ -59,9 +59,10 @@ class AddFileController : Initializable {
                 fileChooser.title = "选择文件"
                 val chooserStage = Stage()
                 // 打开可以多选文件的是视窗
-                fileList = fileChooser.showOpenMultipleDialog(chooserStage)
-                if (!fileList.isEmpty()) {
-                   addTableViewData()
+
+                val selectedFileList = fileChooser.showOpenMultipleDialog(chooserStage)
+                if (!selectedFileList.isEmpty()) {
+                    addTableViewData(selectedFileList)
                 }
             }
         }
@@ -70,7 +71,7 @@ class AddFileController : Initializable {
         nextButton.setOnAction {
             run {
                 //保存fileList
-                LeoContext.save(HANDLE_FILE,fileList)
+                LeoContext.save(HANDLE_FILE, fileList)
                 // 跳到添加规则集页面
                 println("下一步跳到添加规则集")
                 val primaryStage = StageManager.getStageByName(primaryStageName)
@@ -123,13 +124,17 @@ class AddFileController : Initializable {
     /**
      * 给tableView添加数据
      */
-    private fun addTableViewData(): MutableList<File> {
+    private fun addTableViewData(selectedFileList: List<File>){
         fileDataList.clear()
-        for (file in fileList) {
-            fileDataList.add(FileData(file.name, file.path, deleteButton(fileList.indexOf(file))))
+
+        //todo
+        for (file in selectedFileList) {
+            if (!fileList.contains(file)) {
+                fileList.add(file)
+            }
         }
-        fileTableView.items.also { it.clear();it.addAll(fileDataList) }
-        return fileList
+
+        refreshTableView()
     }
 
     /**
@@ -150,8 +155,19 @@ class AddFileController : Initializable {
                 tempFileList.addAll(fileList)
                 tempFileList.removeAt(index)
                 fileList = tempFileList
-                addTableViewData()
+                refreshTableView()
             }
         }
+    }
+
+    /**
+     * 刷新tableView展示数据
+     */
+    private fun refreshTableView() {
+        fileDataList.clear()
+        for (file in fileList) {
+            fileDataList.add(FileData(file.name, file.path, deleteButton(fileList.indexOf(file))))
+        }
+        fileTableView.items.also { it.clear();it.addAll(fileDataList) }
     }
 }
