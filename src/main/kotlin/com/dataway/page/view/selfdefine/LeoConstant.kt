@@ -21,11 +21,15 @@ const val TARGET_DIR = "targetDir"
 /**
  * 选中的规则集
  */
-const val SELECTED_RULESET = "selectedRuleSet"
+const val SELECTED_RULE_SET = "selectedRuleSet"
 /**
  * 选中的规则
  */
 const val SELECTED_RULE = "selectedRule"
+/**
+ * 选中的规则的父规则集
+ */
+const val SELECTED_RULE_PARENT_RULE_SET = "selectedRuleParentRuleSet"
 //--------------end------------------
 
 //-------文件处理状态begin-----------

@@ -1,27 +1,21 @@
-import com.dataway.page.ConfigurationMainApp
 import com.dataway.page.util.PropsUtils
 import com.dataway.page.view.selfdefine.LeoContext
 import com.dataway.page.view.selfdefine.SELECTED_RULE
-import com.dataway.page.view.selfdefine.SELECTED_RULESET
+import com.dataway.page.view.selfdefine.SELECTED_RULE_PARENT_RULE_SET
+import com.dataway.page.view.selfdefine.SELECTED_RULE_SET
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
 import javafx.scene.control.Button
 import javafx.scene.control.ContextMenu
-import javafx.scene.control.Control
 import javafx.scene.control.MenuItem
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
 import javafx.scene.input.MouseButton
 import javafx.scene.layout.AnchorPane
-import javafx.scene.layout.VBox
 import jodd.props.Props
-import org.apache.coyote.http11.Constants.a
-import java.awt.Event
 import java.io.File
-import java.io.FilenameFilter
 import java.net.URL
-import java.text.DecimalFormat
 import java.util.ResourceBundle
 
 
@@ -108,10 +102,11 @@ class RuleSetController : Initializable {
                 val selectedKey: String
                 if (ruleSetNodeList.contains(observer.value)) {
                     fxmlUrl = parentFxmlUrl
-                    selectedKey = SELECTED_RULESET
+                    selectedKey = SELECTED_RULE_SET
                 } else {
                     fxmlUrl = childFxmlUrl
                     selectedKey = SELECTED_RULE
+                    LeoContext.save(SELECTED_RULE_PARENT_RULE_SET,observer.value.parent.value)
                 }
                 LeoContext.save(selectedKey, observer.value.value)
 
@@ -137,7 +132,6 @@ class RuleSetController : Initializable {
             val loader = FXMLLoader()
 
             loader.location = javaClass.getResource(childFxmlUrl)
-            LeoContext.save(SELECTED_RULE,null)
             LeoContext.save(SELECTED_RULE,null)
 
             val wantedPane: AnchorPane = loader.load()

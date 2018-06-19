@@ -1,7 +1,7 @@
 package com.dataway.page.view.configuration
 
 import com.dataway.page.view.selfdefine.LeoContext
-import com.dataway.page.view.selfdefine.SELECTED_RULESET
+import com.dataway.page.view.selfdefine.SELECTED_RULE_SET
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.scene.control.Button
@@ -36,7 +36,7 @@ class RuleSetParentNodeController : Initializable {
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         //名称
-        ruleSetNameTextField.text = LeoContext.getValue(SELECTED_RULESET) as String?
+        ruleSetNameTextField.text = LeoContext.getValue(SELECTED_RULE_SET) as String?
         //todo 验证列名(根据规则集名称查询其验证列名)
         //todo 验证规则:根据规则集名称查询其验证规则 --choiceBox初始化
 
