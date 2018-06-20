@@ -37,3 +37,22 @@ const val FILE_HANDLE_FINISH = "已完成"
 const val FILE_HANDLE_READY = "未处理"
 const val FILE_HANDLE_ING = "处理中"
 //-------文件处理状态end-----------
+
+//--------配置文件的key--------------
+//规则名称前缀
+const val RULE_PREFIX = "file"
+//列名称
+const val RULE_COLUMN_NAMES = "columnNames"
+//数据校验值
+const val RULE_COLUMN_VALUES = "columnValues"
+//包含列
+const val RULE_INCLUDE_COLUMNS = "includeColumns"
+//排除列
+const val RULE_EXCLUDE_COLUMNS = "excludeColumns"
+//最大值
+const val RULE_CHECK_MAX_SCALE = "checkMaxScale"
+//最小值
+const val RULE_CHECK_MIN_SCALE = "checkMinScale"
+//top值
+const val RULE_TOP_COLUMNS = "topColumns"
+//------------------------------------

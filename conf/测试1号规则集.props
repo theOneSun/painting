@@ -46,7 +46,7 @@ columnNames=人群,高价值,资产指数,消费指数,养生关注,老人健康
 # 列值
 columnValues.人群=d1,d2
 # 包含列
-includeColumns=
+includeColumns=人群,高价值,资产指数,消费指数
 # 排除列
 excludeColumns=手机品牌,手机型号
 # 列比例检查

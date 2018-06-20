@@ -8,7 +8,7 @@ class Rule {
     private lateinit var keyWorld: String
     private lateinit var columnList: ArrayList<String>
     private lateinit var includeColumns: ArrayList<String> // 统计列
-    private lateinit var normalRule: NormalRule
+    private lateinit var normalRule: NormalRuleRow
     private lateinit var crossRule: CrossRule
 
 }

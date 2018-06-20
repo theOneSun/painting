@@ -25,6 +25,7 @@
         <kotlin.version>1.2.41</kotlin.version>
         <lombok.version>1.16.20</lombok.version>
         <jodd.version>4.3.2</jodd.version>
+        <!--<lang3.version>3.7</lang3.version>-->
     </properties>
 
     <dependencies>
@@ -73,6 +74,12 @@
             <artifactId>jodd-props</artifactId>
             <version>${jodd.version}</version>
         </dependency>
+        <!--<dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${lang3.version}</version>
+        </dependency>-->
+
     </dependencies>
 
     <build>
