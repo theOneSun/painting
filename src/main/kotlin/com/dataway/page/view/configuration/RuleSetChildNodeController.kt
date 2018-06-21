@@ -1,30 +1,41 @@
 package com.dataway.page.view.configuration
 
+import ch.qos.logback.core.joran.conditional.ElseAction
+import com.dataway.page.model.CrossRuleRow
 import com.dataway.page.model.NormalRuleRow
+import com.dataway.page.util.PropsUtils
 import com.dataway.page.view.selfdefine.LeoContext
 import com.dataway.page.view.selfdefine.RULE_CHECK_MAX_SCALE
 import com.dataway.page.view.selfdefine.RULE_CHECK_MIN_SCALE
 import com.dataway.page.view.selfdefine.RULE_COLUMN_NAMES
 import com.dataway.page.view.selfdefine.RULE_COLUMN_VALUES
+import com.dataway.page.view.selfdefine.RULE_CROSS_COLUMNS
 import com.dataway.page.view.selfdefine.RULE_INCLUDE_COLUMNS
 import com.dataway.page.view.selfdefine.RULE_PREFIX
 import com.dataway.page.view.selfdefine.RULE_TOP_COLUMNS
 import com.dataway.page.view.selfdefine.SELECTED_RULE
 import com.dataway.page.view.selfdefine.SELECTED_RULE_PARENT_RULE_SET
+import javafx.beans.value.ChangeListener
+import javafx.collections.FXCollections
+import javafx.collections.ObservableList
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.scene.control.Button
+import javafx.scene.control.ChoiceBox
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.scene.control.cell.CheckBoxTableCell
+import javafx.scene.control.cell.ChoiceBoxTableCell
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.control.cell.TextFieldTableCell
 import javafx.util.converter.DoubleStringConverter
 import jodd.props.Props
+import java.awt.SystemColor.text
 import java.io.File
 import java.net.URL
 import java.util.Collections
+import java.util.Observable
 import java.util.ResourceBundle
 
 /**
@@ -36,10 +47,14 @@ class RuleSetChildNodeController : Initializable {
     private lateinit var ruleNameTextField: TextField
     @FXML
     private lateinit var normalTableView: TableView<NormalRuleRow>
+    @FXML
+    private lateinit var crossTableView: TableView<CrossRuleRow>
 
     //常规的列的集合,每一行是一个对象
     private var normalColumnRowList: ArrayList<NormalRuleRow> = arrayListOf()
-    //    private var normalColumnRowList: ArrayList<NormalRuleRow> = arrayListOf()
+    //交叉的数据的集合,一行是一个对象
+    private var crossRowList: ArrayList<CrossRuleRow> = arrayListOf()
+
     //常规列名集合
     private var columnList: ArrayList<String> = arrayListOf()
     //规则集配置文件对象
@@ -67,11 +82,116 @@ class RuleSetChildNodeController : Initializable {
 
         //初始化表格数据
         initNormalTableView()
+        //todo 初始化交叉项表格
+        initCrossTableView()
         //todo 根据规则名称查询生效关键字
     }
 
     /**
-     * 初始化表格的表头
+     * 初始化交叉规则的表格的表头
+     */
+    private fun initCrossTableView() {
+        val column1 = this.createChoiceBoxTableColumn(255.0, "交叉项1", "crossItemA")
+        val column2 = this.createChoiceBoxTableColumn(255.0, "交叉项2", "crossItemB")
+        val column3 = this.createChoiceBoxTableColumn(255.0, "交叉项3", "crossItemC")
+        val maxScaleColumn = TableColumn<CrossRuleRow, Double>("交叉最大比例")
+        maxScaleColumn.prefWidth = 253.0
+        maxScaleColumn.isSortable = false
+        maxScaleColumn.isEditable = true
+        maxScaleColumn.cellFactory = TextFieldTableCell.forTableColumn(DoubleStringConverter())
+        maxScaleColumn.cellValueFactory = PropertyValueFactory("maxScale")
+        crossTableView.columns.addAll(column1, column2, column3, maxScaleColumn)
+
+        //读取常规配置的列名
+        val names = ruleSetProps.getValue("$RULE_PREFIX.$ruleName.$RULE_COLUMN_NAMES")
+
+        //读取已有的配置
+        val crossColumnsMap = PropsUtils.getMapByPrefix(ruleSetProps, "$RULE_PREFIX.$ruleName.$RULE_CROSS_COLUMNS")
+        println(crossColumnsMap)
+        val optionList = names.split(",") as ArrayList
+        for (entry in crossColumnsMap) {
+            /*
+            遍历map
+            1.每一个keyValue对应一行数据
+            2.按照,分割取三个数据作为crossRuleRow的交叉项123
+            3.choiceBox的可选项需要有一个是空的
+             */
+            val rowColumns = entry.value
+            val rowSelectedList = rowColumns.split(",")
+            val crossRuleRow = CrossRuleRow()
+            //可选择的选项列表
+            optionList.add(0, "")
+
+            var j = 1
+            //循环配置文件中的值,展示已经选择的交叉项
+            for (i in rowSelectedList.indices) {
+                //自身和空串都不删
+                val removeList = arrayListOf<String>().also { it.addAll(rowSelectedList);it.remove(rowSelectedList[i]);it.remove("") }
+                val realOptionList = arrayListOf<String>().also { it.addAll(optionList) }
+                realOptionList.removeAll(removeList)
+                when (j) {
+                    1 -> {
+
+                        crossRuleRow.crossItemA = this.createChoiceBox(255.0, realOptionList, rowSelectedList[i])
+
+
+                        crossRuleRow.crossItemA.selectionModel.selectedItemProperty().addListener { observable, oldValue, newValue ->
+                            //B列,C列增加oldValue,不可选newValue
+                            val changeRemoveList = arrayListOf<String>().also { it.addAll(rowSelectedList);it.remove(oldValue);it.remove("");it.add(newValue) }
+                            val changeOptionList = arrayListOf<String>().also { it.addAll(optionList) }
+                            changeOptionList.removeAll(changeRemoveList)
+                            val selectedItemB = crossRuleRow.crossItemB.selectionModel.selectedItem
+                            println("selectedItemB$selectedItemB")
+                            val selectedItemC = crossRuleRow.crossItemC.selectionModel.selectedItem
+                            println("selectedItemC$selectedItemC")
+                            println("changeOptionList$changeOptionList")
+                            crossRuleRow.crossItemB.items.also {
+                                it.clear()
+                                it.addAll(changeOptionList)
+                            }
+                            crossRuleRow.crossItemB.selectionModel.select(selectedItemB)
+                            println(crossRuleRow.crossItemB.selectionModel.selectedItem)
+//                            println("b的可选项$selectionModel")
+                            crossRuleRow.crossItemC.items.also {
+                                it.clear()
+                                it.addAll(changeOptionList)
+                            }
+                            crossRuleRow.crossItemC.selectionModel.select(selectedItemC)
+                        }
+                    }
+                    2 -> {
+                        //设置配置项2
+
+                        crossRuleRow.crossItemB = this.createChoiceBox(255.0, realOptionList, rowSelectedList[i])
+
+                    }
+                    3 -> {
+                        //设置配置项3
+
+                        crossRuleRow.crossItemC = this.createChoiceBox(255.0, realOptionList, rowSelectedList[i])
+                    }
+                    else -> {
+                    }
+                }
+                j++
+            }
+
+            crossRowList.add(crossRuleRow)
+        }
+
+        crossTableView.isEditable = true
+        crossTableView.items.addAll(crossRowList)
+    }
+
+    /**
+     * 刷新crossTableView
+     */
+    private fun refreshCrossTableView(){
+
+    }
+
+    /**
+     * 初始化常规规则的表格的表头
      */
     private fun initNormalTableView() {
 
@@ -126,6 +246,22 @@ class RuleSetChildNodeController : Initializable {
     }
 
     /**
+     * 生成文本的TableColumn
+     */
+    private fun createChoiceBox(prefWidth: Double, optionList: MutableList<String>, selectedOption: String): ChoiceBox<String> {
+        return ChoiceBox(FXCollections.observableArrayList(optionList)).also {
+            it.prefWidth = prefWidth
+            it.prefHeight(30.0)
+            it.selectionModel.select(selectedOption)
+            /*it.selectionModel.selectedItemProperty().addListener { observable, oldValue, newValue ->
+                crossRowList.forEach {
+
+                }
+            }*/
+        }
+    }
+
+    /**
      * 生成Double的TableColumn
      */
     private fun createDoubleTableColumn(prefWidth: Double, text: String, property: String): TableColumn<NormalRuleRow, Double> {
@@ -134,6 +270,17 @@ class RuleSetChildNodeController : Initializable {
         tableColumn.isSortable = false
         tableColumn.isEditable = true
         tableColumn.cellFactory = TextFieldTableCell.forTableColumn(DoubleStringConverter())
+        tableColumn.cellValueFactory = PropertyValueFactory(property)
+        return tableColumn
+    }
+
+    /**
+     * 生成ChoiceBox的TableColumn
+     */
+    private fun createChoiceBoxTableColumn(prefWidth: Double, text: String, property: String): TableColumn<CrossRuleRow, ChoiceBox<String>> {
+        val tableColumn = TableColumn<CrossRuleRow, ChoiceBox<String>>(text)
+        tableColumn.prefWidth = prefWidth
+        tableColumn.isSortable = false
         tableColumn.cellValueFactory = PropertyValueFactory(property)
         return tableColumn
     }

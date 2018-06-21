@@ -14,50 +14,40 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="943.0" prefWidth="1058.0" xmlns="http://javafx.com/javafx/8.0.141"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.dataway.page.view.configuration.RuleSetChildNodeController">
+<AnchorPane prefHeight="943.0" prefWidth="1058.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.dataway.page.view.configuration.RuleSetChildNodeController">
 
     <children>
-        <VBox prefHeight="943.0" prefWidth="1058.0" spacing="20.0" AnchorPane.bottomAnchor="0.0"
-              AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="15.0">
+        <VBox prefHeight="943.0" prefWidth="1058.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="15.0">
             <children>
                 <GridPane prefHeight="100.0" prefWidth="998.0">
                     <columnConstraints>
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="174.0" minWidth="5.0" prefWidth="78.0"/>
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="443.0" minWidth="10.0" prefWidth="443.0"/>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="174.0" minWidth="5.0" prefWidth="78.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="443.0" minWidth="10.0" prefWidth="443.0" />
                     </columnConstraints>
                     <rowConstraints>
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                     <children>
-                        <Label contentDisplay="CENTER" prefHeight="40.0" prefWidth="120.0" text="规则名称"/>
-                        <Label prefHeight="40.0" prefWidth="226.0" text="生效关键字" GridPane.rowIndex="1"/>
-                        <TextField fx:id="ruleNameTextField" prefHeight="30.0" prefWidth="300.0"
-                                   GridPane.columnIndex="1"/>
-                        <TextField prefHeight="30.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        <Label contentDisplay="CENTER" prefHeight="40.0" prefWidth="120.0" text="规则名称" />
+                        <Label prefHeight="40.0" prefWidth="226.0" text="生效关键字" GridPane.rowIndex="1" />
+                        <TextField fx:id="ruleNameTextField" prefHeight="30.0" prefWidth="300.0" GridPane.columnIndex="1" />
+                        <TextField prefHeight="30.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                     </children>
                     <VBox.margin>
-                        <Insets left="20.0"/>
+                        <Insets left="20.0" />
                     </VBox.margin>
                 </GridPane>
-                <Separator prefWidth="200.0"/>
+                <Separator prefWidth="200.0" />
                 <AnchorPane prefHeight="785.0" prefWidth="1018.0">
                     <children>
-                        <TabPane layoutX="96.0" layoutY="76.0" prefHeight="524.0" prefWidth="1018.0"
-                                 tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0"
-                                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <TabPane layoutX="96.0" layoutY="76.0" prefHeight="524.0" prefWidth="1018.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <tabs>
                                 <Tab text="常规">
                                     <content>
-                                        <AnchorPane fx:id="normalPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0"
-                                                    prefWidth="200.0">
+                                        <AnchorPane fx:id="normalPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                             <children>
-                                                <TableView fx:id="normalTableView" layoutX="172.0" layoutY="73.0" prefHeight="746.0"
-                                                           prefWidth="1018.0" AnchorPane.bottomAnchor="0.0"
-                                                           AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                                                           AnchorPane.topAnchor="0.0">
+                                                <TableView fx:id="normalTableView" layoutX="172.0" layoutY="73.0" prefHeight="746.0" prefWidth="1018.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                     <!--<columns>
                                                         <TableColumn prefWidth="200.0" text="文件列名"/>
                                                         <TableColumn text="统计"/>
@@ -76,46 +66,23 @@
                                 </Tab>
                                 <Tab text="交叉">
                                     <content>
-                                        <AnchorPane fx:id="crossPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0"
-                                                    prefWidth="200.0">
-                                            <children>
-                                                <GridPane layoutX="132.0" layoutY="107.0" prefHeight="485.0"
-                                                          prefWidth="664.0" AnchorPane.bottomAnchor="10.0"
-                                                          AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="10.0"
-                                                          AnchorPane.topAnchor="20.0">
-                                                    <columnConstraints>
-                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"
-                                                                           prefWidth="100.0"/>
-                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"
-                                                                           prefWidth="100.0"/>
-                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"
-                                                                           prefWidth="100.0"/>
-                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"
-                                                                           prefWidth="100.0"/>
-                                                    </columnConstraints>
-                                                    <rowConstraints>
-                                                        <RowConstraints maxHeight="30.0" minHeight="10.0"
-                                                                        prefHeight="30.0" vgrow="SOMETIMES"/>
-                                                    </rowConstraints>
-                                                    <children>
-                                                        <Label alignment="CENTER" prefHeight="30.0" prefWidth="164.0"
-                                                               text="交叉项1"/>
-                                                        <Label alignment="CENTER" prefHeight="30.0" prefWidth="164.0"
-                                                               text="交叉项2" GridPane.columnIndex="1"/>
-                                                        <Label alignment="CENTER" prefHeight="30.0" prefWidth="164.0"
-                                                               text="交叉项3" GridPane.columnIndex="2"/>
-                                                        <Label alignment="CENTER" prefHeight="30.0" prefWidth="164.0"
-                                                               text="交叉最大比例" GridPane.columnIndex="3"/>
-                                                    </children>
-                                                </GridPane>
-                                            </children>
+                                        <AnchorPane fx:id="crossPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <TableView fx:id="crossTableView" layoutX="137.0" layoutY="106.0" prefHeight="746.0" prefWidth="1018.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                     <!-- <columns>
+                                        <TableColumn prefWidth="255.0" text="C1" />
+                                          <TableColumn prefWidth="255.0" text="C1" />
+                                          <TableColumn prefWidth="255.0" text="C1" />
+                                          <TableColumn prefWidth="253.0" text="C1" />
+                                      </columns>-->
+                                    </TableView>
+                                 </children>
                                         </AnchorPane>
                                     </content>
                                 </Tab>
                                 <Tab text="新增列">
                                     <content>
-                                        <AnchorPane fx:id="addColumnPane" minHeight="0.0" minWidth="0.0"
-                                                    prefHeight="180.0" prefWidth="200.0"/>
+                                        <AnchorPane fx:id="addColumnPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                                     </content>
                                 </Tab>
                             </tabs>

@@ -1,17 +1,11 @@
 package com.dataway.page.model
 
-import javafx.beans.property.BooleanProperty
-import javafx.beans.property.DoubleProperty
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.StringProperty
 import javafx.scene.control.Button
 import lombok.Data
-import org.springframework.beans.factory.parsing.FailFastProblemReporter
 
 /**
  * @author sunjian.
  */
-@Data
 class NormalRuleRow() {
     /*lateinit var columnName: StringProperty
     var include: BooleanProperty = SimpleBooleanProperty(false) //是否统计

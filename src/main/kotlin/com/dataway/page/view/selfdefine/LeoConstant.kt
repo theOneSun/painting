@@ -55,4 +55,7 @@ const val RULE_CHECK_MAX_SCALE = "checkMaxScale"
 const val RULE_CHECK_MIN_SCALE = "checkMinScale"
 //top值
 const val RULE_TOP_COLUMNS = "topColumns"
+
+//交叉规则的配置
+const val RULE_CROSS_COLUMNS = "crossColumns"
 //------------------------------------

@@ -53,7 +53,7 @@ excludeColumns=手机品牌,手机型号
 checkMaxScale.人群=30
 checkMinScale.人群=1
 # 交叉统计
-crossColumns.group1=人群,性别
+crossColumns.group1=人群,性别,
 # 交叉统计检查
 crossCheckMinScale.group1=20
 crossCheckMaxScale.group1=20
