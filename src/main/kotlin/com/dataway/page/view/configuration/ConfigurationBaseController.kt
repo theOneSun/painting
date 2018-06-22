@@ -31,6 +31,17 @@ class ConfigurationBaseController : Initializable {
     @FXML
     private lateinit var searchButton: Button
 
+    //取消按钮
+//    @FXML
+//    private lateinit var cancelButton: Button
+//    //应用按钮
+//    @FXML
+//    private lateinit var saveButton: Button
+//    //确认按钮
+//    @FXML
+//    private lateinit var confirmButton: Button
+
+
     private val listViewOptions: Array<String> = arrayOf("通用", "规则集", "支持库")
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
@@ -48,12 +59,25 @@ class ConfigurationBaseController : Initializable {
         //设置listView
         val missions = FXCollections.observableArrayList("通用", "规则集", "支持库")
         setOptionListView.items = missions
+
+        //取消
+//        cancelButton.setOnAction {
+//            doCancel()
+//        }
+//        //应用
+//        saveButton.setOnAction {
+//            doSave()
+//        }
+//        //确认
+//        confirmButton.setOnAction {
+//            doConfirm()
+//        }
     }
 
     @FXML
     fun onMouseClicked() {
         val selectedItem = setOptionListView.selectionModel.selectedItem ?: return
-        println("选中的设置项是$selectedItem")
+//        println("选中的设置项是$selectedItem")
         when (selectedItem) {
             "通用" -> {
                 showDetailPane("/com/dataway/page/view/Common.fxml")
@@ -92,4 +116,9 @@ class ConfigurationBaseController : Initializable {
     }
 
     //todo 后期实现文本框第一次点击时清空内容
+
+    //todo 取消应用确认接口
+//    abstract fun doCancel()
+//    abstract fun doSave()
+//    abstract fun doConfirm()
 }
