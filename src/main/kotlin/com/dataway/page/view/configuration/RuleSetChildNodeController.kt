@@ -10,6 +10,7 @@ import com.dataway.page.view.selfdefine.RULE_CHECK_MIN_SCALE
 import com.dataway.page.view.selfdefine.RULE_COLUMN_NAMES
 import com.dataway.page.view.selfdefine.RULE_COLUMN_VALUES
 import com.dataway.page.view.selfdefine.RULE_CROSS_COLUMNS
+import com.dataway.page.view.selfdefine.RULE_CROSS_MAX_SCALE
 import com.dataway.page.view.selfdefine.RULE_INCLUDE_COLUMNS
 import com.dataway.page.view.selfdefine.RULE_PREFIX
 import com.dataway.page.view.selfdefine.RULE_TOP_COLUMNS
@@ -126,55 +127,195 @@ class RuleSetChildNodeController : Initializable {
             //循环配置文件中的值,展示已经选择的交叉项
             for (i in rowSelectedList.indices) {
                 //自身和空串都不删
-                val removeList = arrayListOf<String>().also { it.addAll(rowSelectedList);it.remove(rowSelectedList[i]);it.remove("") }
+                /*val removeList = arrayListOf<String>().also { it.addAll(rowSelectedList);it.remove(rowSelectedList[i]);it.remove("") }
                 val realOptionList = arrayListOf<String>().also { it.addAll(optionList) }
-                realOptionList.removeAll(removeList)
+                realOptionList.removeAll(removeList)*/
                 when (j) {
                     1 -> {
-
-                        crossRuleRow.crossItemA = this.createChoiceBox(255.0, realOptionList, rowSelectedList[i])
-
-
+                        /*crossRuleRow.crossItemA = this.createChoiceBox(255.0, realOptionList, rowSelectedList[i])
+                        //选择的值改变的监听器
                         crossRuleRow.crossItemA.selectionModel.selectedItemProperty().addListener { observable, oldValue, newValue ->
-                            //B列,C列增加oldValue,不可选newValue
-                            val changeRemoveList = arrayListOf<String>().also { it.addAll(rowSelectedList);it.remove(oldValue);it.remove("");it.add(newValue) }
-                            val changeOptionList = arrayListOf<String>().also { it.addAll(optionList) }
-                            changeOptionList.removeAll(changeRemoveList)
+                            //B列,C列增加oldValue,不可选newValue.B列需要增加本身的项,C列增加本身的项
+                            //B列
                             val selectedItemB = crossRuleRow.crossItemB.selectionModel.selectedItem
                             println("selectedItemB$selectedItemB")
+
+                            val changeRemoveListB = arrayListOf<String>().also {
+                                //在这个集合里的是不可选的
+                                it.addAll(rowSelectedList)
+                                //原来的值可以展示了
+                                it.remove(oldValue)
+                                //空串一直可选
+                                it.remove("")
+                                //B列本身的数据可选
+                                it.remove(selectedItemB)
+                                //新选的项也不可选
+                                it.add(newValue)
+                            }
+                            val changeOptionListB = arrayListOf<String>().also { it.addAll(optionList) }
+                            changeOptionListB.removeAll(changeRemoveListB)
+                            println("changeOptionListB$changeOptionListB")
+                            crossRuleRow.crossItemB.also {
+                                it.items.clear()
+                                it.items.addAll(changeOptionListB)
+                                it.selectionModel.select(selectedItemB)
+                            }
+
+                            //C列
                             val selectedItemC = crossRuleRow.crossItemC.selectionModel.selectedItem
                             println("selectedItemC$selectedItemC")
-                            println("changeOptionList$changeOptionList")
-                            crossRuleRow.crossItemB.items.also {
-                                it.clear()
-                                it.addAll(changeOptionList)
+                            val changeRemoveListC = arrayListOf<String>().also {
+                                //在这个集合里的是不可选的
+                                it.addAll(rowSelectedList)
+                                //原来的值可以展示了
+                                it.remove(oldValue)
+                                //空串一直可选
+                                it.remove("")
+                                //B列本身的数据可选
+                                it.remove(selectedItemC)
+                                //新选的项也不可选
+                                it.add(newValue)
                             }
-                            crossRuleRow.crossItemB.selectionModel.select(selectedItemB)
-                            println(crossRuleRow.crossItemB.selectionModel.selectedItem)
-//                            println("b的可选项$selectionModel")
-                            crossRuleRow.crossItemC.items.also {
-                                it.clear()
-                                it.addAll(changeOptionList)
+                            val changeOptionListC = arrayListOf<String>().also { it.addAll(optionList) }
+                            changeOptionListC.removeAll(changeRemoveListC)
+                            println("changeOptionListC$changeOptionListC")
+
+                            crossRuleRow.crossItemC.also {
+                                it.items.clear()
+                                it.items.addAll(changeOptionListC)
+                                it.selectionModel.select(selectedItemC)
                             }
-                            crossRuleRow.crossItemC.selectionModel.select(selectedItemC)
-                        }
+                        }*/
+                        crossRuleRow.crossItemA = this.createChoiceBox(255.0, optionList, rowSelectedList[i])
                     }
                     2 -> {
                         //设置配置项2
+//                        crossRuleRow.crossItemB = this.createChoiceBox(255.0, realOptionList, rowSelectedList[i])
+                        crossRuleRow.crossItemB = this.createChoiceBox(255.0, optionList, rowSelectedList[i])
 
-                        crossRuleRow.crossItemB = this.createChoiceBox(255.0, realOptionList, rowSelectedList[i])
+                        //值改变监听
+                        /*crossRuleRow.crossItemB.selectionModel.selectedItemProperty().addListener { observable, oldValue, newValue ->
+                            //A列,C列增加oldValue,不可选newValue.A列需要增加本身的项,C列增加本身的项
+                            //A列
+                            val selectedItemA = crossRuleRow.crossItemA.selectionModel.selectedItem
+                            println("selectedItemA$selectedItemA")
 
+                            val changeRemoveListA = arrayListOf<String>().also {
+                                //在这个集合里的是不可选的
+                                it.addAll(rowSelectedList)
+                                //原来的值可以展示了
+                                it.remove(oldValue)
+                                //空串一直可选
+                                it.remove("")
+                                //B列本身的数据可选
+                                it.remove(selectedItemA)
+                                //新选的项也不可选
+                                it.add(newValue)
+                            }
+                            val changeOptionListA = arrayListOf<String>().also { it.addAll(optionList) }
+                            changeOptionListA.removeAll(changeRemoveListA)
+                            println("changeOptionListA$changeOptionListA")
+                            crossRuleRow.crossItemA.also {
+                                it.items.clear()
+                                it.items.addAll(changeOptionListA)
+                                it.selectionModel.select(selectedItemA)
+                            }
+
+                            //B列
+                            val selectedItemB = crossRuleRow.crossItemB.selectionModel.selectedItem
+                            println("selectedItemB$selectedItemB")
+
+                            val changeRemoveListB = arrayListOf<String>().also {
+                                //在这个集合里的是不可选的
+                                it.addAll(rowSelectedList)
+                                //原来的值可以展示了
+                                it.remove(oldValue)
+                                //空串一直可选
+                                it.remove("")
+                                //B列本身的数据可选
+                                it.remove(selectedItemB)
+                                //新选的项也不可选
+                                it.add(newValue)
+                            }
+                            val changeOptionListB = arrayListOf<String>().also { it.addAll(optionList) }
+                            changeOptionListB.removeAll(changeRemoveListB)
+                            println("changeOptionListB$changeOptionListB")
+                            crossRuleRow.crossItemB.also {
+                                it.items.clear()
+                                it.items.addAll(changeOptionListB)
+                                it.selectionModel.select(selectedItemB)
+                            }
+                        }*/
                     }
                     3 -> {
                         //设置配置项3
+//                        crossRuleRow.crossItemC = this.createChoiceBox(255.0, realOptionList, rowSelectedList[i])
+                        crossRuleRow.crossItemC = this.createChoiceBox(255.0, optionList, rowSelectedList[i])
 
-                        crossRuleRow.crossItemC = this.createChoiceBox(255.0, realOptionList, rowSelectedList[i])
+                        //值改变监听
+                        /*crossRuleRow.crossItemC.selectionModel.selectedItemProperty().addListener { observable, oldValue, newValue ->
+                            //A列,C列增加oldValue,不可选newValue.A列需要增加本身的项,C列增加本身的项
+                            //A列
+                            val selectedItemA = crossRuleRow.crossItemA.selectionModel.selectedItem
+                            println("selectedItemA$selectedItemA")
+
+                            val changeRemoveListA = arrayListOf<String>().also {
+                                //在这个集合里的是不可选的
+                                it.addAll(rowSelectedList)
+                                //原来的值可以展示了
+                                it.remove(oldValue)
+                                //空串一直可选
+                                it.remove("")
+                                //B列本身的数据可选
+                                it.remove(selectedItemA)
+                                //新选的项也不可选
+                                it.add(newValue)
+                            }
+                            val changeOptionListA = arrayListOf<String>().also { it.addAll(optionList) }
+                            changeOptionListA.removeAll(changeRemoveListA)
+                            println("changeOptionListA$changeOptionListA")
+                            crossRuleRow.crossItemA.also {
+                                it.items.clear()
+                                it.items.addAll(changeOptionListA)
+                                it.selectionModel.select(selectedItemA)
+                            }
+
+                            //C列
+                            val selectedItemC = crossRuleRow.crossItemC.selectionModel.selectedItem
+                            println("selectedItemC$selectedItemC")
+                            val changeRemoveListC = arrayListOf<String>().also {
+                                //在这个集合里的是不可选的
+                                it.addAll(rowSelectedList)
+                                //原来的值可以展示了
+                                it.remove(oldValue)
+                                //空串一直可选
+                                it.remove("")
+                                //B列本身的数据可选
+                                it.remove(selectedItemC)
+                                //新选的项也不可选
+                                it.add(newValue)
+                            }
+                            val changeOptionListC = arrayListOf<String>().also { it.addAll(optionList) }
+                            changeOptionListC.removeAll(changeRemoveListC)
+                            println("changeOptionListC$changeOptionListC")
+
+                            crossRuleRow.crossItemC.also {
+                                it.items.clear()
+                                it.items.addAll(changeOptionListC)
+                                it.selectionModel.select(selectedItemC)
+                            }
+                        }*/
                     }
                     else -> {
                     }
                 }
                 j++
             }
+
+            //交叉最大比例的输入框
+            val keySplitList = entry.key.split(".")
+            val lastKeyWord = keySplitList.last()
+            crossRuleRow.maxScale = ruleSetProps.getValue("$RULE_PREFIX.$ruleName.$RULE_CROSS_MAX_SCALE.$lastKeyWord")?.toDouble()
 
             crossRowList.add(crossRuleRow)
         }
@@ -186,7 +327,7 @@ class RuleSetChildNodeController : Initializable {
     /**
      * 刷新crossTableView
      */
-    private fun refreshCrossTableView(){
+    private fun refreshCrossTableView() {
 
     }
 
