@@ -6,7 +6,10 @@ import com.dataway.page.view.selfdefine.SELECTED_RULE_SET
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
+import javafx.scene.control.Alert
 import javafx.scene.control.Button
+import javafx.scene.control.ButtonBar
+import javafx.scene.control.ButtonType
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.MenuItem
 import javafx.scene.control.TreeItem
@@ -52,6 +55,7 @@ class RuleSetController : Initializable {
 
     private val parentFxmlUrl = "/com/dataway/page/view/RuleSetParentNode.fxml"
     private val childFxmlUrl = "/com/dataway/page/view/RuleSetChildNode.fxml"
+    private val ruleSetPath = "${System.getProperty("user.dir")}/conf/"
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         //设置根节点
@@ -65,7 +69,7 @@ class RuleSetController : Initializable {
         val selectedItemProperty = ruleSetTreeView.selectionModel.selectedItemProperty()
         // --------------------------------------------------------------
         // todo 检测所有规则集配置文件
-        val projectPath = System.getProperty("user.dir")
+        /*val projectPath = System.getProperty("user.dir")
         println("项目路径$projectPath")
         val ruleSetFileList = File("$projectPath/conf").listFiles({ _, name ->
             name.endsWith(".props")
@@ -90,31 +94,36 @@ class RuleSetController : Initializable {
 
             //规则集节点添加到抽象根节点中
             abstractRoot.children.add(ruleSetRoot)
-        }
+        }*/
+
+        //加载树数据
+        loadTreeData(abstractRoot)
 
         // 选中节点改变事件
         selectedItemProperty.addListener({ observer, _, _ ->
             run {
-                println("选中的节点是:$observer")
-                val loader = FXMLLoader()
+                if (observer.value != null) {
+                    println("选中的节点是:$observer")
+                    val loader = FXMLLoader()
 
-                val fxmlUrl: String
-                val selectedKey: String
-                if (ruleSetNodeList.contains(observer.value)) {
-                    fxmlUrl = parentFxmlUrl
-                    selectedKey = SELECTED_RULE_SET
-                } else {
-                    fxmlUrl = childFxmlUrl
-                    selectedKey = SELECTED_RULE
-                    LeoContext.save(SELECTED_RULE_PARENT_RULE_SET,observer.value.parent.value)
-                }
-                LeoContext.save(selectedKey, observer.value.value)
+                    val fxmlUrl: String
+                    val selectedKey: String
+                    if (ruleSetNodeList.contains(observer.value)) {
+                        fxmlUrl = parentFxmlUrl
+                        selectedKey = SELECTED_RULE_SET
+                    } else {
+                        fxmlUrl = childFxmlUrl
+                        selectedKey = SELECTED_RULE
+                        LeoContext.save(SELECTED_RULE_PARENT_RULE_SET, observer.value.parent.value)
+                    }
+                    LeoContext.save(selectedKey, observer.value.value)
 
-                loader.location = javaClass.getResource(fxmlUrl)
-                val wantedPane: AnchorPane = loader.load()
-                rightPane.children.also {
-                    it.clear()
-                    it.add(wantedPane)
+                    loader.location = javaClass.getResource(fxmlUrl)
+                    val wantedPane: AnchorPane = loader.load()
+                    rightPane.children.also {
+                        it.clear()
+                        it.add(wantedPane)
+                    }
                 }
             }
         })
@@ -132,7 +141,7 @@ class RuleSetController : Initializable {
             val loader = FXMLLoader()
 
             loader.location = javaClass.getResource(childFxmlUrl)
-            LeoContext.save(SELECTED_RULE,null)
+            LeoContext.save(SELECTED_RULE, null)
 
             val wantedPane: AnchorPane = loader.load()
             rightPane.children.also {
@@ -177,7 +186,7 @@ class RuleSetController : Initializable {
         //todo 初始化按钮事件
         addButton.setOnMouseClicked {
             //设置已选中的规则集是空的
-            LeoContext.save(SELECTED_RULE_SET,null)
+            LeoContext.save(SELECTED_RULE_SET, null)
             // 添加规则集
             val fxmlLoader = FXMLLoader()
             fxmlLoader.location = javaClass.getResource(parentFxmlUrl)
@@ -189,7 +198,52 @@ class RuleSetController : Initializable {
         }
         deleteButton.setOnMouseClicked {
             //todo 删除选中的规则集
+            //判断选中的是否是规则集
+            if (ruleSetNodeList.contains(selectedItemProperty.value)) {
+                //右键的是规则集节点
 
+
+                val alert = Alert(Alert.AlertType.CONFIRMATION, "", ButtonType("取消", ButtonBar.ButtonData.NO), ButtonType("确定", ButtonBar.ButtonData.YES))
+                alert.height = 500.0
+                alert.width = 400.0
+                alert.title = "111"
+                alert.headerText = "确认删除?"
+
+                val result = alert.showAndWait()
+                if (result.get().buttonData == ButtonBar.ButtonData.YES) {
+                    val ruleSetFile = File("$ruleSetPath${LeoContext.getValue(SELECTED_RULE_SET)}.props")
+
+                    if (ruleSetFile.exists() && ruleSetFile.isFile) {
+                        if (ruleSetFile.delete()) {
+                            println("删除成功")
+                            //刷新树
+                            loadTreeData(abstractRoot)
+                        } else {
+                            val warnDialog = Alert(Alert.AlertType.ERROR)
+                            warnDialog.height = 500.0
+                            warnDialog.width = 400.0
+                            warnDialog.title = "错误"
+                            warnDialog.contentText = "删除失败"
+                            warnDialog.showAndWait()
+                        }
+                    } else {
+                        val warnDialog = Alert(Alert.AlertType.ERROR)
+                        warnDialog.height = 500.0
+                        warnDialog.width = 400.0
+                        warnDialog.title = "注意"
+                        warnDialog.contentText = "文件不存在"
+                        warnDialog.showAndWait()
+                    }
+                } else {
+                    println("取消删除")
+                }
+            } else {
+                val chooseWrongDialog = Alert(Alert.AlertType.WARNING)
+                chooseWrongDialog.height = 500.0
+                chooseWrongDialog.width = 400.0
+                chooseWrongDialog.contentText = "请选择规则集!"
+                chooseWrongDialog.showAndWait()
+            }
         }
         copyButton.setOnMouseClicked {
             //todo 复制选中的规则集,并增加节点
@@ -234,5 +288,36 @@ class RuleSetController : Initializable {
             resultSet.add(split[1])
         }
         return resultSet
+    }
+
+    /**
+     * 加载树节点的数据
+     */
+    private fun loadTreeData(abstractRoot: TreeItem<String>) {
+        abstractRoot.children.clear()
+        val projectPath = System.getProperty("user.dir")
+        println("项目路径$projectPath")
+        val ruleSetFileList = File("$projectPath/conf").listFiles({ _, name ->
+            name.endsWith(".props")
+        })
+        for (ruleSetFile in ruleSetFileList) {
+            println("ruleSetFile$ruleSetFile")
+            val name = ruleSetFile.name
+            val ruleSetRoot = TreeItem(name.substring(0, name.lastIndexOf(".")))
+            ruleSetRoot.isExpanded = true
+            ruleSetNodeList.add(ruleSetRoot)
+            //todo 读取详细数据拿到子节点(规则)并设置
+            val ruleSetProps = Props()
+//            ruleSetProps.setValue("user.dir.conf",System.getProperty("user.dir")+"/conf")
+            ruleSetProps.load(ruleSetFile)
+            val ruleNameList = getRuleName(ruleSetProps)
+            for (ruleName in ruleNameList) {
+                val ruleRoot = TreeItem(ruleName)
+                ruleSetRoot.children.add(ruleRoot)
+            }
+
+            //规则集节点添加到抽象根节点中
+            abstractRoot.children.add(ruleSetRoot)
+        }
     }
 }

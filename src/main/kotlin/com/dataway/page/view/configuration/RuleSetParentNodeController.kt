@@ -4,6 +4,7 @@ import com.dataway.page.util.PropsUtils
 import com.dataway.page.view.selfdefine.BottomAction
 import com.dataway.page.view.selfdefine.CURRENT_BOTTOM_ACTION
 import com.dataway.page.view.selfdefine.LeoContext
+import com.dataway.page.view.selfdefine.RULE_PREFIX
 import com.dataway.page.view.selfdefine.RULE_SET_VERIFY_COLUMN
 import com.dataway.page.view.selfdefine.SELECTED_RULE_SET
 import javafx.fxml.FXML
@@ -19,17 +20,17 @@ import javafx.scene.layout.RowConstraints
 import javafx.scene.layout.VBox
 import jodd.props.Props
 import jodd.props.PropsConverter
+import org.apache.commons.lang3.StringUtils
 import java.io.File
 import java.io.FileWriter
 import java.net.URL
-import java.util.Properties
 import java.util.ResourceBundle
 
 
 /**
  * @author sunjian.
  */
-class RuleSetParentNodeController : Initializable,BottomAction {
+class RuleSetParentNodeController : Initializable, BottomAction {
 
     @FXML
     private lateinit var parentNodeVBox: VBox
@@ -53,7 +54,7 @@ class RuleSetParentNodeController : Initializable,BottomAction {
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         //底部
-        LeoContext.save(CURRENT_BOTTOM_ACTION,this)
+        LeoContext.save(CURRENT_BOTTOM_ACTION, this)
 
         //名称
         val ruleSetName = LeoContext.getValue(SELECTED_RULE_SET) as String?
@@ -62,7 +63,7 @@ class RuleSetParentNodeController : Initializable,BottomAction {
         }
         ruleSetNameTextField.text = ruleSetName
         //todo 验证列名(根据规则集名称查询其验证列名)
-        this.showData()
+
         //todo 验证规则:根据规则集名称查询其验证规则 --choiceBox初始化
 
 
@@ -73,7 +74,7 @@ class RuleSetParentNodeController : Initializable,BottomAction {
 
 
         //loopAdd()
-
+        this.showData(ruleSetName)
     }
 
     private fun loopAdd() {
@@ -106,7 +107,7 @@ class RuleSetParentNodeController : Initializable,BottomAction {
 
     //取消按钮
     override fun doCancel() {
-        showData()
+        showData(LeoContext.getValue(SELECTED_RULE_SET).toString())
     }
 
     override fun doSave() {
@@ -118,7 +119,7 @@ class RuleSetParentNodeController : Initializable,BottomAction {
         val ruleSetName = ruleSetNameTextField.text
         val verifyColumn = verifyColumnTextField.text
         val fileName = "${System.getProperty("user.dir")}/conf/$ruleSetName.props"
-        if (editPage){
+        if (editPage) {
             //编辑
             //规则集名称
 
@@ -129,18 +130,16 @@ class RuleSetParentNodeController : Initializable,BottomAction {
 
             props.load(File(fileName))
 
-            props.setValue(RULE_SET_VERIFY_COLUMN,verifyColumn)
+            props.setValue(RULE_SET_VERIFY_COLUMN, verifyColumn)
 //            val orderedProperties = PropsUtils.convertProperties(props)
             val orderedProperties = PropsUtils.convertOrderProperties(props)
             orderedProperties.keys
             //存储的时候再转成props
-            PropsConverter.convert(FileWriter(fileName),orderedProperties)
+            PropsConverter.convert(FileWriter(fileName), orderedProperties)
 
             // 更新页面数据
-            this.showData()
-            //支持库
-
-        }else{
+            this.showData(ruleSetName)
+        } else {
             //新增
             //规则集名称
 
@@ -191,13 +190,32 @@ class RuleSetParentNodeController : Initializable,BottomAction {
     /**
      * 展示规则集页面的数据(根据名称加载配置文件,展示数据)
      */
-    private fun showData(){
-        val ruleSetName = LeoContext.getValue(SELECTED_RULE_SET) as String?
-        val props = Props()
-        props.load(File("$ruleSetConfigPath$ruleSetName.props"))
-        //验证列名
-        verifyColumnTextField.text = props.getValue(RULE_SET_VERIFY_COLUMN)
-        //todo 验证规则
-        //todo 支持库
+    private fun showData(ruleSetName: String?) {
+        if (StringUtils.isNotBlank(ruleSetName)) {
+            //不为空,为新建编辑
+            val props = Props()
+            props.load(File("$ruleSetConfigPath$ruleSetName.props"))
+            //验证列名
+            verifyColumnTextField.text = props.getValue(RULE_SET_VERIFY_COLUMN)
+            //todo 验证规则
+            val ruleList = arrayListOf<String>()
+            val rulePropertyMap = PropsUtils.getMapByPrefix(props, RULE_PREFIX)
+            for (entry in rulePropertyMap.entries){
+                ruleList.add(entry.key.split(".")[1])
+            }
+
+            //todo 支持库
+        }
+    }
+
+    private fun createDeleteButton(rowIndex:Int):Button{
+        val button = Button("D")
+//        maxWidth="30.0" mnemonicParsing="false" prefHeight="30.0" text="D" GridPane.columnIndex="2" GridPane.rowIndex="2"
+        button.maxWidth = 30.0
+        button.prefHeight = 30.0
+        button.setOnAction {
+
+        }
+        return button
     }
 }
