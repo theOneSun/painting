@@ -176,6 +176,8 @@ class RuleSetController : Initializable {
 
         //todo 初始化按钮事件
         addButton.setOnMouseClicked {
+            //设置已选中的规则集是空的
+            LeoContext.save(SELECTED_RULE_SET,null)
             // 添加规则集
             val fxmlLoader = FXMLLoader()
             fxmlLoader.location = javaClass.getResource(parentFxmlUrl)

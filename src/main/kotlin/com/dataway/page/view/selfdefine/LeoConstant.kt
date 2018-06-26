@@ -30,6 +30,10 @@ const val SELECTED_RULE = "selectedRule"
  * 选中的规则的父规则集
  */
 const val SELECTED_RULE_PARENT_RULE_SET = "selectedRuleParentRuleSet"
+/**
+ * 当前底部操作的对象(确认应用取消的执行者)
+ */
+const val CURRENT_BOTTOM_ACTION = "currentBottomAction"
 //--------------end------------------
 
 //-------文件处理状态begin-----------
@@ -63,4 +67,9 @@ const val RULE_CROSS_MAX_SCALE = "crossCheckMaxScale"
 
 const val RULE_CROSS_MIN_SCALE = "crossCheckMinScale"
 
+//规则集验证列名
+const val RULE_SET_VERIFY_COLUMN = "ruleSet.verifyColumn"
+
 //------------------------------------
+
+//--------------普通常量------------

@@ -1,10 +1,13 @@
 package com.dataway.page.view.configuration
 
+import com.dataway.page.view.selfdefine.BottomAction
+import com.dataway.page.view.selfdefine.CURRENT_BOTTOM_ACTION
 import com.dataway.page.view.selfdefine.LeoContext
 import com.dataway.page.view.selfdefine.TARGET_DIR
 import javafx.collections.FXCollections
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
+import javafx.scene.control.Alert
 import javafx.scene.control.Button
 import javafx.scene.control.ChoiceBox
 import javafx.scene.control.TextField
@@ -16,7 +19,7 @@ import java.util.ResourceBundle
 /**
  * @author sunjian.
  */
-class CommonController : Initializable {
+class CommonController : Initializable,BottomAction {
 
     @FXML
     private lateinit var corpusChoiceBox: ChoiceBox<String>
@@ -27,6 +30,9 @@ class CommonController : Initializable {
 
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
+
+        //更改底部操作对象
+        LeoContext.save(CURRENT_BOTTOM_ACTION,this)
 
         //todo 从全局中读取输出目录,如过没有就设置为项目根目录,回车后修改
         val value = LeoContext.getValue(TARGET_DIR)
@@ -49,6 +55,25 @@ class CommonController : Initializable {
             if (event.button == MouseButton.PRIMARY)
                 println("合并本地语料库")
         }
+    }
 
+    override fun doCancel() {
+        println("取消更改")
+        /*val alert = Alert(Alert.AlertType.CONFIRMATION)
+        alert.height = 500.0
+        alert.width = 400.0
+        alert.title = "取消"
+        alert.contentText = "hahahaha"
+        alert.show()*/
+    }
+
+    override fun doSave() {
+        this.doConfirm()
+    }
+
+    //确认按钮,获取统计文件存放目录保存
+    override fun doConfirm() {
+        println("保存${targetDirTextField.text}")
+        LeoContext.save(TARGET_DIR,targetDirTextField.text)
     }
 }

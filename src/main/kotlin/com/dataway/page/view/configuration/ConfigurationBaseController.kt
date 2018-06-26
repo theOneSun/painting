@@ -1,5 +1,8 @@
 package com.dataway.page.view.configuration
 
+import com.dataway.page.view.selfdefine.BottomAction
+import com.dataway.page.view.selfdefine.CURRENT_BOTTOM_ACTION
+import com.dataway.page.view.selfdefine.LeoContext
 import com.dataway.page.view.selfdefine.StageManager
 import com.dataway.page.view.selfdefine.primaryStageName
 import javafx.collections.FXCollections
@@ -32,14 +35,14 @@ class ConfigurationBaseController : Initializable {
     private lateinit var searchButton: Button
 
     //取消按钮
-//    @FXML
-//    private lateinit var cancelButton: Button
-//    //应用按钮
-//    @FXML
-//    private lateinit var saveButton: Button
-//    //确认按钮
-//    @FXML
-//    private lateinit var confirmButton: Button
+    @FXML
+    private lateinit var cancelButton: Button
+    //应用按钮
+    @FXML
+    private lateinit var saveButton: Button
+    //确认按钮
+    @FXML
+    private lateinit var confirmButton: Button
 
 
     private val listViewOptions: Array<String> = arrayOf("通用", "规则集", "支持库")
@@ -61,17 +64,17 @@ class ConfigurationBaseController : Initializable {
         setOptionListView.items = missions
 
         //取消
-//        cancelButton.setOnAction {
-//            doCancel()
-//        }
-//        //应用
-//        saveButton.setOnAction {
-//            doSave()
-//        }
-//        //确认
-//        confirmButton.setOnAction {
-//            doConfirm()
-//        }
+        cancelButton.setOnAction {
+            doCancel()
+        }
+        //应用
+        saveButton.setOnAction {
+            doSave()
+        }
+        //确认
+        confirmButton.setOnAction {
+            doConfirm()
+        }
     }
 
     @FXML
@@ -118,7 +121,20 @@ class ConfigurationBaseController : Initializable {
     //todo 后期实现文本框第一次点击时清空内容
 
     //todo 取消应用确认接口
-//    abstract fun doCancel()
-//    abstract fun doSave()
-//    abstract fun doConfirm()
+    private fun doCancel(){
+        println("click cancel")
+        val bottomAction = LeoContext.getValue(CURRENT_BOTTOM_ACTION) as BottomAction?
+        bottomAction?.doCancel()
+    }
+    //应用
+    private fun doSave(){
+        val bottomAction = LeoContext.getValue(CURRENT_BOTTOM_ACTION) as BottomAction?
+        bottomAction?.doSave()
+    }
+    //确认
+    private fun doConfirm(){
+        println("click confirm")
+        val bottomAction = LeoContext.getValue(CURRENT_BOTTOM_ACTION) as BottomAction?
+        bottomAction?.doConfirm()
+    }
 }

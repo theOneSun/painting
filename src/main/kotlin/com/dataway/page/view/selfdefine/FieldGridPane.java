@@ -4,6 +4,8 @@ import javafx.fxml.FXML;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 
+import java.util.Properties;
+
 /**
  * @author sunjian.
  */
@@ -15,6 +17,6 @@ public class FieldGridPane{
         GridPane gridPane = new GridPane();
         RowConstraints rowConstraints = new RowConstraints();
 
-
+//    new Properties().keySet()
     }
 }
