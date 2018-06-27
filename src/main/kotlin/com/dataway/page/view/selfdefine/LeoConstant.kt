@@ -36,6 +36,10 @@ const val SELECTED_RULE_PARENT_RULE_SET = "selectedRuleParentRuleSet"
 const val CURRENT_BOTTOM_ACTION = "currentBottomAction"
 //--------------end------------------
 
+//--------------控制器begin------------
+const val RULE_SET_CONTROLLER = "ruleSetController"
+//--------------控制器end------------
+
 //-------文件处理状态begin-----------
 const val FILE_HANDLE_FINISH = "已完成"
 const val FILE_HANDLE_READY = "未处理"

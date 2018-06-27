@@ -1,5 +1,9 @@
+package com.dataway.page.view.configuration
+
+import com.dataway.page.util.DialogFactory
 import com.dataway.page.util.PropsUtils
 import com.dataway.page.view.selfdefine.LeoContext
+import com.dataway.page.view.selfdefine.RULE_SET_CONTROLLER
 import com.dataway.page.view.selfdefine.SELECTED_RULE
 import com.dataway.page.view.selfdefine.SELECTED_RULE_PARENT_RULE_SET
 import com.dataway.page.view.selfdefine.SELECTED_RULE_SET
@@ -9,7 +13,6 @@ import javafx.fxml.Initializable
 import javafx.scene.control.Alert
 import javafx.scene.control.Button
 import javafx.scene.control.ButtonBar
-import javafx.scene.control.ButtonType
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.MenuItem
 import javafx.scene.control.TreeItem
@@ -19,6 +22,7 @@ import javafx.scene.layout.AnchorPane
 import jodd.props.Props
 import java.io.File
 import java.net.URL
+import java.nio.file.Files
 import java.util.ResourceBundle
 
 
@@ -56,10 +60,13 @@ class RuleSetController : Initializable {
     private val parentFxmlUrl = "/com/dataway/page/view/RuleSetParentNode.fxml"
     private val childFxmlUrl = "/com/dataway/page/view/RuleSetChildNode.fxml"
     private val ruleSetPath = "${System.getProperty("user.dir")}/conf/"
+    //抽象的根节点(不显示)
+    private  val abstractRoot = TreeItem("")
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
+        //将控制器放到全局对象容器中保管
+        LeoContext.save(RULE_SET_CONTROLLER,this)
         //设置根节点
-        val abstractRoot = TreeItem("")
         // --------------------------------------------------------------
         ruleSetTreeView.root = abstractRoot
         // 不显示根节点
@@ -97,7 +104,7 @@ class RuleSetController : Initializable {
         }*/
 
         //加载树数据
-        loadTreeData(abstractRoot)
+        loadTreeData()
 
         // 选中节点改变事件
         selectedItemProperty.addListener({ observer, _, _ ->
@@ -201,15 +208,9 @@ class RuleSetController : Initializable {
             //判断选中的是否是规则集
             if (ruleSetNodeList.contains(selectedItemProperty.value)) {
                 //右键的是规则集节点
+                val confirmDialog = DialogFactory.createConfirmDialog(500.0, 400.0, "", "", "确认删除规则集${selectedItemProperty.value}?")
 
-
-                val alert = Alert(Alert.AlertType.CONFIRMATION, "", ButtonType("取消", ButtonBar.ButtonData.NO), ButtonType("确定", ButtonBar.ButtonData.YES))
-                alert.height = 500.0
-                alert.width = 400.0
-                alert.title = "111"
-                alert.headerText = "确认删除?"
-
-                val result = alert.showAndWait()
+                val result = confirmDialog.showAndWait()
                 if (result.get().buttonData == ButtonBar.ButtonData.YES) {
                     val ruleSetFile = File("$ruleSetPath${LeoContext.getValue(SELECTED_RULE_SET)}.props")
 
@@ -217,7 +218,7 @@ class RuleSetController : Initializable {
                         if (ruleSetFile.delete()) {
                             println("删除成功")
                             //刷新树
-                            loadTreeData(abstractRoot)
+                            loadTreeData()
                         } else {
                             val warnDialog = Alert(Alert.AlertType.ERROR)
                             warnDialog.height = 500.0
@@ -247,6 +248,16 @@ class RuleSetController : Initializable {
         }
         copyButton.setOnMouseClicked {
             //todo 复制选中的规则集,并增加节点
+            if (ruleSetNodeList.contains(selectedItemProperty.value)) {
+                val ruleSetFile = File("$ruleSetPath${LeoContext.getValue(SELECTED_RULE_SET)}.props")
+                val targetFile = File("$ruleSetPath${LeoContext.getValue(SELECTED_RULE_SET)}_copy.props")
+                if (ruleSetFile.exists() && ruleSetFile.isFile) {
+                    Files.copy(ruleSetFile.toPath(),targetFile.toPath())
+                    loadTreeData()
+                }else{
+                    println("文件不存在")
+                }
+            }
         }
         moveButton.setOnMouseClicked {
             //todo 移动选中的规则集
@@ -293,7 +304,7 @@ class RuleSetController : Initializable {
     /**
      * 加载树节点的数据
      */
-    private fun loadTreeData(abstractRoot: TreeItem<String>) {
+    fun loadTreeData() {
         abstractRoot.children.clear()
         val projectPath = System.getProperty("user.dir")
         println("项目路径$projectPath")

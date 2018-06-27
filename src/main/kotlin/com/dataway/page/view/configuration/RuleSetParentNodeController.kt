@@ -1,10 +1,12 @@
 package com.dataway.page.view.configuration
 
+import com.dataway.page.util.DialogFactory
 import com.dataway.page.util.PropsUtils
 import com.dataway.page.view.selfdefine.BottomAction
 import com.dataway.page.view.selfdefine.CURRENT_BOTTOM_ACTION
 import com.dataway.page.view.selfdefine.LeoContext
 import com.dataway.page.view.selfdefine.RULE_PREFIX
+import com.dataway.page.view.selfdefine.RULE_SET_CONTROLLER
 import com.dataway.page.view.selfdefine.RULE_SET_VERIFY_COLUMN
 import com.dataway.page.view.selfdefine.SELECTED_RULE_SET
 import javafx.fxml.FXML
@@ -47,6 +49,8 @@ class RuleSetParentNodeController : Initializable, BottomAction {
 
     var ruleSetConfigPath = "${System.getProperty("user.dir")}/conf/"
 
+    private lateinit var ruleSetController: RuleSetController
+
     /**
      * 判断是修改规则集还是新增规则集
      */
@@ -55,6 +59,8 @@ class RuleSetParentNodeController : Initializable, BottomAction {
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         //底部
         LeoContext.save(CURRENT_BOTTOM_ACTION, this)
+        //规则集控制器
+        ruleSetController = LeoContext.getValue(RULE_SET_CONTROLLER) as RuleSetController
 
         //名称
         val ruleSetName = LeoContext.getValue(SELECTED_RULE_SET) as String?
@@ -62,6 +68,7 @@ class RuleSetParentNodeController : Initializable, BottomAction {
             editPage = false
         }
         ruleSetNameTextField.text = ruleSetName
+
         //todo 验证列名(根据规则集名称查询其验证列名)
 
         //todo 验证规则:根据规则集名称查询其验证规则 --choiceBox初始化
@@ -116,39 +123,98 @@ class RuleSetParentNodeController : Initializable, BottomAction {
 
     override fun doConfirm() {
         //判断是编辑还是新增
+//        var ruleSetName: String?
+//         ruleSetName =
+        //判断有没有改名
+        /*if (ruleSetNameTextField.text == LeoContext.getValue(SELECTED_RULE_SET)) {
+            ruleSetName = LeoContext.getValue(SELECTED_RULE_SET) as String?
+        } else {
+            ruleSetName = ruleSetNameTextField.text
+            editPage = false
+        }*/
         val ruleSetName = ruleSetNameTextField.text
-        val verifyColumn = verifyColumnTextField.text
         val fileName = "${System.getProperty("user.dir")}/conf/$ruleSetName.props"
+        val verifyColumn = verifyColumnTextField.text
+
         if (editPage) {
-            //编辑
-            //规则集名称
+            //编辑状态
+            //判断是否修改规则集名称
+
+            if (ruleSetName == LeoContext.getValue(SELECTED_RULE_SET)) {
+                //没改规则集名称
+                val props = Props()
+
+                props.load(File(fileName))
+
+                props.setValue(RULE_SET_VERIFY_COLUMN, verifyColumn)
+//            val orderedProperties = PropsUtils.convertProperties(props)
+                val orderedProperties = PropsUtils.convertOrderProperties(props)
+//                orderedProperties.keys
+                //存储的时候再转成props
+                PropsConverter.convert(FileWriter(fileName), orderedProperties)
+            } else {
+                //修改了规则集名称
+                val oldRuleSetName = LeoContext.getValue(SELECTED_RULE_SET)
+                val ruleSetFile = File(fileName)
+                if (ruleSetFile.exists()) {
+                    //修改的名称已存在不可以修改
+                    val errorDialog = DialogFactory.createErrorDialog(500.0, 400.0, "", "规则集名称已存在")
+                    errorDialog.showAndWait()
+                } else {
+                    //可以修改
+
+                    val oldFileName = "${System.getProperty("user.dir")}/conf/$oldRuleSetName.props"
+                    val props = Props()
+
+                    props.load(File(oldFileName))
+                    props.setValue(RULE_SET_VERIFY_COLUMN, verifyColumn)
+                    val orderedProperties = PropsUtils.convertOrderProperties(props)
+                    //todo 其它属性添加
+
+                    //存储的时候再转成props
+                    PropsConverter.convert(FileWriter(fileName), orderedProperties)
+                    //保存新的规则集名称
+                    LeoContext.save(SELECTED_RULE_SET, ruleSetName)
+                    File(oldFileName).delete()
+
+                }
+            }
+//            val fileName = "${System.getProperty("user.dir")}/conf/$ruleSetName.props"
 
             //验证列名
             println("验证列名$verifyColumn")
             //验证规则
-            val props = Props()
-
-            props.load(File(fileName))
-
-            props.setValue(RULE_SET_VERIFY_COLUMN, verifyColumn)
-//            val orderedProperties = PropsUtils.convertProperties(props)
-            val orderedProperties = PropsUtils.convertOrderProperties(props)
-            orderedProperties.keys
-            //存储的时候再转成props
-            PropsConverter.convert(FileWriter(fileName), orderedProperties)
 
             // 更新页面数据
             this.showData(ruleSetName)
         } else {
-            //新增
+
+            //todo 新增 将所有数据保存到properties中并生成文件
+            val ruleSetFile = File(fileName)
+            if (ruleSetFile.exists()) {
+                //修改的名称已存在不可以修改
+                val errorDialog = DialogFactory.createErrorDialog(500.0, 400.0, "", "规则集名称已存在")
+                errorDialog.showAndWait()
+            } else {
+                println("新增可以存")
+            }
             //规则集名称
 
             //验证列名
             println("验证列名$verifyColumn")
             val props = Props()
             props.setValue(RULE_SET_VERIFY_COLUMN, verifyColumn)
+            //todo 其他数据
 
+            val orderedProperties = PropsUtils.convertOrderProperties(props)
+
+            //存储的时候再转成props
+            PropsConverter.convert(FileWriter(fileName), orderedProperties)
         }
+
+        //TODO 更新树结构
+
+        ruleSetController.loadTreeData()
 
     }
 
@@ -191,6 +257,7 @@ class RuleSetParentNodeController : Initializable, BottomAction {
      * 展示规则集页面的数据(根据名称加载配置文件,展示数据)
      */
     private fun showData(ruleSetName: String?) {
+        //val ruleSetName = LeoContext.getValue(SELECTED_RULE_SET) as String?
         if (StringUtils.isNotBlank(ruleSetName)) {
             //不为空,为新建编辑
             val props = Props()
@@ -200,7 +267,7 @@ class RuleSetParentNodeController : Initializable, BottomAction {
             //todo 验证规则
             val ruleList = arrayListOf<String>()
             val rulePropertyMap = PropsUtils.getMapByPrefix(props, RULE_PREFIX)
-            for (entry in rulePropertyMap.entries){
+            for (entry in rulePropertyMap.entries) {
                 ruleList.add(entry.key.split(".")[1])
             }
 
@@ -208,7 +275,7 @@ class RuleSetParentNodeController : Initializable, BottomAction {
         }
     }
 
-    private fun createDeleteButton(rowIndex:Int):Button{
+    private fun createDeleteButton(rowIndex: Int): Button {
         val button = Button("D")
 //        maxWidth="30.0" mnemonicParsing="false" prefHeight="30.0" text="D" GridPane.columnIndex="2" GridPane.rowIndex="2"
         button.maxWidth = 30.0
@@ -218,4 +285,18 @@ class RuleSetParentNodeController : Initializable, BottomAction {
         }
         return button
     }
+
+    /*private fun loadProps(propsFile: File,verifyColumn:String){
+        val props = Props()
+
+        props.load()
+
+        props.setValue(RULE_SET_VERIFY_COLUMN, verifyColumn)
+//            val orderedProperties = PropsUtils.convertProperties(props)
+        val orderedProperties = PropsUtils.convertOrderProperties(props)
+        orderedProperties.keys
+        //存储的时候再转成props
+        PropsConverter.convert(FileWriter(fileName), orderedProperties)
+    }*/
+
 }
