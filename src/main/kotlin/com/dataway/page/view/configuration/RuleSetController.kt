@@ -118,6 +118,7 @@ class RuleSetController : Initializable {
                     if (ruleSetNodeList.contains(observer.value)) {
                         fxmlUrl = parentFxmlUrl
                         selectedKey = SELECTED_RULE_SET
+                        LeoContext.save(SELECTED_RULE_PARENT_RULE_SET, observer.value.value)
                     } else {
                         fxmlUrl = childFxmlUrl
                         selectedKey = SELECTED_RULE
@@ -173,6 +174,8 @@ class RuleSetController : Initializable {
         }*/
         ruleSetTreeView.setOnMouseClicked { event ->
             contextMenu.hide()
+            //保存被选中的规则集到全局对象容器中
+            //LeoContext.save(SELECTED_RULE_SET,ruleSetTreeView.selectionModel.selectedItem.value)
             // todo 添加右键操作
             val button = event.button
             if (MouseButton.SECONDARY == button) {
@@ -180,7 +183,6 @@ class RuleSetController : Initializable {
                     //右键的是规则集节点
                     val treeItem = ruleSetTreeView.selectionModel.selectedItem
                     println("右键规则集$treeItem")
-
                     contextMenu.show(ruleSetTreeView, event.screenX, event.screenY)
                 } else {
                     contextMenu.hide()

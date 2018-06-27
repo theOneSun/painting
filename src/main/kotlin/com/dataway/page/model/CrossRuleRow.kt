@@ -1,5 +1,6 @@
 package com.dataway.page.model
 
+import javafx.scene.control.Button
 import javafx.scene.control.ChoiceBox
 
 /**
@@ -10,4 +11,6 @@ class CrossRuleRow {
     lateinit var crossItemB: ChoiceBox<String>
     lateinit var crossItemC: ChoiceBox<String>
     var maxScale: Double? = null
+    lateinit var deleteButton: Button
+    var addButton: Button? = null
 }

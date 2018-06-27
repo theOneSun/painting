@@ -1,9 +1,10 @@
 package com.dataway.page.view.configuration
 
-import ch.qos.logback.core.joran.conditional.ElseAction
 import com.dataway.page.model.CrossRuleRow
 import com.dataway.page.model.NormalRuleRow
 import com.dataway.page.util.PropsUtils
+import com.dataway.page.view.selfdefine.BottomAction
+import com.dataway.page.view.selfdefine.CURRENT_BOTTOM_ACTION
 import com.dataway.page.view.selfdefine.LeoContext
 import com.dataway.page.view.selfdefine.RULE_CHECK_MAX_SCALE
 import com.dataway.page.view.selfdefine.RULE_CHECK_MIN_SCALE
@@ -13,12 +14,11 @@ import com.dataway.page.view.selfdefine.RULE_CROSS_COLUMNS
 import com.dataway.page.view.selfdefine.RULE_CROSS_MAX_SCALE
 import com.dataway.page.view.selfdefine.RULE_INCLUDE_COLUMNS
 import com.dataway.page.view.selfdefine.RULE_PREFIX
+import com.dataway.page.view.selfdefine.RULE_SET_CONTROLLER
 import com.dataway.page.view.selfdefine.RULE_TOP_COLUMNS
 import com.dataway.page.view.selfdefine.SELECTED_RULE
 import com.dataway.page.view.selfdefine.SELECTED_RULE_PARENT_RULE_SET
-import javafx.beans.value.ChangeListener
 import javafx.collections.FXCollections
-import javafx.collections.ObservableList
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.scene.control.Button
@@ -27,22 +27,20 @@ import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.scene.control.cell.CheckBoxTableCell
-import javafx.scene.control.cell.ChoiceBoxTableCell
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.control.cell.TextFieldTableCell
 import javafx.util.converter.DoubleStringConverter
 import jodd.props.Props
-import java.awt.SystemColor.text
+import org.apache.commons.lang3.StringUtils
 import java.io.File
 import java.net.URL
 import java.util.Collections
-import java.util.Observable
 import java.util.ResourceBundle
 
 /**
  * @author sunjian.
  */
-class RuleSetChildNodeController : Initializable {
+class RuleSetChildNodeController : Initializable, BottomAction {
 
     @FXML
     private lateinit var ruleNameTextField: TextField
@@ -50,6 +48,8 @@ class RuleSetChildNodeController : Initializable {
     private lateinit var normalTableView: TableView<NormalRuleRow>
     @FXML
     private lateinit var crossTableView: TableView<CrossRuleRow>
+    //规则集控制器
+    private lateinit var ruleSetController: RuleSetController
 
     //常规的列的集合,每一行是一个对象
     private var normalColumnRowList: ArrayList<NormalRuleRow> = arrayListOf()
@@ -62,19 +62,36 @@ class RuleSetChildNodeController : Initializable {
     private var ruleSetProps: Props = Props()
     private var ruleName: String? = null//默认没有选中规则,因为可能是新建规则
     private lateinit var ruleSetName: String // 到这个页面,选中的规则集一定不为空
+    private val configPath = "${System.getProperty("user.dir")}/conf"
+    //是否是编辑
+    private var editPage: Boolean = true
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
-//        val ruleName = LeoContext.getValue(SELECTED_RULE) as String?
+        //底部
+        LeoContext.save(CURRENT_BOTTOM_ACTION, this)
+        //规则集控制器
+        ruleSetController = LeoContext.getValue(RULE_SET_CONTROLLER) as RuleSetController
+        //判断是编辑页还是添加规则
         ruleName = LeoContext.getValue(SELECTED_RULE) as String?
-//        val ruleSetName = LeoContext.getValue(SELECTED_RULE_PARENT_RULE_SET)
         ruleSetName = LeoContext.getValue(SELECTED_RULE_PARENT_RULE_SET) as String
-        //todo 根据规则集名称查询配置文件,返回props对象
-        val configPath = System.getProperty("user.dir") + "/conf"
+
+        if (StringUtils.isBlank(ruleName)) {
+            editPage = false
+            //初始化表格数据
+            initNormalTableView()
+            //初始化交叉项表格
+            initCrossTableView()
+        } else {
+            showData()
+        }
+
+
+        /*//todo 根据规则集名称查询配置文件,返回props对象
 
         ruleSetProps.load(File("$configPath/$ruleSetName.props"))
         val columns = ruleSetProps.getValue("$RULE_PREFIX.$ruleName.$RULE_COLUMN_NAMES")
         val includeColumns = ruleSetProps.getValue("$RULE_PREFIX.$ruleName.$RULE_INCLUDE_COLUMNS")
-        println(columns)
+
         //规则名称
         ruleNameTextField.text = ruleName
 
@@ -85,6 +102,29 @@ class RuleSetChildNodeController : Initializable {
         initNormalTableView()
         //todo 初始化交叉项表格
         initCrossTableView()
+        //todo 根据规则名称查询生效关键字*/
+
+    }
+
+    /**
+     * 展示数据
+     */
+    private fun showData() {
+        ruleSetProps.load(File("$configPath/$ruleSetName.props"))
+        val columns = ruleSetProps.getValue("$RULE_PREFIX.$ruleName.$RULE_COLUMN_NAMES")
+        val includeColumns = ruleSetProps.getValue("$RULE_PREFIX.$ruleName.$RULE_INCLUDE_COLUMNS")
+
+        //规则名称
+        ruleNameTextField.text = ruleName
+
+        //循环显示列数据tableView
+        convertColumnsToList(columns, includeColumns)
+
+        //初始化表格数据
+        initNormalTableView()
+        //todo 初始化交叉项表格
+        initCrossTableView()
+        showCrossTableView()
         //todo 根据规则名称查询生效关键字
     }
 
@@ -92,17 +132,33 @@ class RuleSetChildNodeController : Initializable {
      * 初始化交叉规则的表格的表头
      */
     private fun initCrossTableView() {
-        val column1 = this.createChoiceBoxTableColumn(255.0, "交叉项1", "crossItemA")
-        val column2 = this.createChoiceBoxTableColumn(255.0, "交叉项2", "crossItemB")
-        val column3 = this.createChoiceBoxTableColumn(255.0, "交叉项3", "crossItemC")
+        val column1 = this.createChoiceBoxTableColumn(230.0, "交叉项1", "crossItemA")
+        val column2 = this.createChoiceBoxTableColumn(230.0, "交叉项2", "crossItemB")
+        val column3 = this.createChoiceBoxTableColumn(230.0, "交叉项3", "crossItemC")
+
         val maxScaleColumn = TableColumn<CrossRuleRow, Double>("交叉最大比例")
-        maxScaleColumn.prefWidth = 253.0
+        maxScaleColumn.prefWidth = 180.0
         maxScaleColumn.isSortable = false
         maxScaleColumn.isEditable = true
         maxScaleColumn.cellFactory = TextFieldTableCell.forTableColumn(DoubleStringConverter())
         maxScaleColumn.cellValueFactory = PropertyValueFactory("maxScale")
-        crossTableView.columns.addAll(column1, column2, column3, maxScaleColumn)
 
+        val deleteColumn = TableColumn<CrossRuleRow, String>("删除")
+        deleteColumn.prefWidth = 100.0
+        deleteColumn.isSortable = false
+        deleteColumn.cellValueFactory = PropertyValueFactory("deleteButton")
+
+        val addButtonColumn = TableColumn<CrossRuleRow,String>("添加")
+        addButtonColumn.prefWidth = 48.0
+        addButtonColumn.isSortable = false
+        addButtonColumn.cellValueFactory = PropertyValueFactory("addButton")
+        crossTableView.columns.addAll(column1, column2, column3, maxScaleColumn,deleteColumn,addButtonColumn)
+    }
+
+    /**
+     * 展示交叉的数据
+     */
+    private fun showCrossTableView() {
         //读取常规配置的列名
         val names = ruleSetProps.getValue("$RULE_PREFIX.$ruleName.$RULE_COLUMN_NAMES")
 
@@ -110,6 +166,7 @@ class RuleSetChildNodeController : Initializable {
         val crossColumnsMap = PropsUtils.getMapByPrefix(ruleSetProps, "$RULE_PREFIX.$ruleName.$RULE_CROSS_COLUMNS")
         println(crossColumnsMap)
         val optionList = names.split(",") as ArrayList
+        var groupIndex=0
         for (entry in crossColumnsMap) {
             /*
             遍历map
@@ -186,12 +243,12 @@ class RuleSetChildNodeController : Initializable {
                                 it.selectionModel.select(selectedItemC)
                             }
                         }*/
-                        crossRuleRow.crossItemA = this.createChoiceBox(255.0, optionList, rowSelectedList[i])
+                        crossRuleRow.crossItemA = this.createChoiceBox(230.0, optionList, rowSelectedList[i])
                     }
                     2 -> {
                         //设置配置项2
 //                        crossRuleRow.crossItemB = this.createChoiceBox(255.0, realOptionList, rowSelectedList[i])
-                        crossRuleRow.crossItemB = this.createChoiceBox(255.0, optionList, rowSelectedList[i])
+                        crossRuleRow.crossItemB = this.createChoiceBox(230.0, optionList, rowSelectedList[i])
 
                         //值改变监听
                         /*crossRuleRow.crossItemB.selectionModel.selectedItemProperty().addListener { observable, oldValue, newValue ->
@@ -250,7 +307,7 @@ class RuleSetChildNodeController : Initializable {
                     3 -> {
                         //设置配置项3
 //                        crossRuleRow.crossItemC = this.createChoiceBox(255.0, realOptionList, rowSelectedList[i])
-                        crossRuleRow.crossItemC = this.createChoiceBox(255.0, optionList, rowSelectedList[i])
+                        crossRuleRow.crossItemC = this.createChoiceBox(230.0, optionList, rowSelectedList[i])
 
                         //值改变监听
                         /*crossRuleRow.crossItemC.selectionModel.selectedItemProperty().addListener { observable, oldValue, newValue ->
@@ -317,6 +374,8 @@ class RuleSetChildNodeController : Initializable {
             val lastKeyWord = keySplitList.last()
             crossRuleRow.maxScale = ruleSetProps.getValue("$RULE_PREFIX.$ruleName.$RULE_CROSS_MAX_SCALE.$lastKeyWord")?.toDouble()
 
+            crossRuleRow.deleteButton = this.createCrossDeleteButton(100.0,30.0,groupIndex++)
+//            crossRuleRow.addButton = this.createCrossAddButton(48.0,30.0)
             crossRowList.add(crossRuleRow)
         }
 
@@ -511,9 +570,9 @@ class RuleSetChildNodeController : Initializable {
     }
 
     /**
-     * 生成删除按钮
+     * 生成常规页面中的删除按钮
      */
-    private fun createDeleteButton(index: Int): Button {
+    private fun createNormalDeleteButton(index: Int): Button {
         return Button("删除").also {
             it.prefWidth = 80.0
             it.prefHeight = 30.0
@@ -524,7 +583,50 @@ class RuleSetChildNodeController : Initializable {
                 refreshRowList()
             }
         }
+    }
+    /**
+     * 生成交叉页面中的删除按钮
+     */
+    private fun createCrossDeleteButton(prefWidth: Double,prefHeight:Double,index: Int): Button {
+        return Button("删除").also {
+            it.prefWidth = prefWidth
+            it.prefHeight = prefHeight
+            it.setOnAction {
+                //设置被选中的行
+                crossTableView.selectionModel.select(index)
+                crossRowList.removeAt(index)
+                refreshCrossRowList()
+            }
+        }
+    }
 
+    /**
+     * 生成交叉页面中的添加按钮
+     */
+    private fun createCrossAddButton(prefWidth: Double,prefHeight:Double): Button {
+        return Button("+").also {
+            it.prefWidth = prefWidth
+            it.prefHeight = prefHeight
+            it.setOnAction {
+                //读取常规配置的列名
+                val names = ruleSetProps.getValue("$RULE_PREFIX.$ruleName.$RULE_COLUMN_NAMES")
+
+                //读取已有的配置
+                val crossColumnsMap = PropsUtils.getMapByPrefix(ruleSetProps, "$RULE_PREFIX.$ruleName.$RULE_CROSS_COLUMNS")
+                println("点急了添加$crossColumnsMap")
+                val optionList = names.split(",") as ArrayList
+                //设置被选中的行
+                val crossRuleRow = CrossRuleRow()
+                crossRuleRow.crossItemA = this.createChoiceBox(230.0,optionList,"")
+                crossRuleRow.crossItemB = this.createChoiceBox(230.0,optionList,"")
+                crossRuleRow.crossItemC = this.createChoiceBox(230.0,optionList,"")
+                crossRuleRow.deleteButton = this.createCrossDeleteButton(100.0,30.0,crossRowList.size)
+//                crossRuleRow.addButton = this.createCrossAddButton(prefWidth,prefHeight)
+                crossRowList.add(crossRuleRow)
+                //跟新数据
+                showCrossTableView()
+            }
+        }
     }
 
     /**
@@ -534,11 +636,36 @@ class RuleSetChildNodeController : Initializable {
         normalColumnRowList.forEach { normalRuleRow: NormalRuleRow ->
             normalRuleRow.upButton = createUpButton(normalColumnRowList.indexOf(normalRuleRow))
             normalRuleRow.downButton = createDownButton(normalColumnRowList.indexOf(normalRuleRow))
-            normalRuleRow.deleteButton = createDeleteButton(normalColumnRowList.indexOf(normalRuleRow))
+            normalRuleRow.deleteButton = createNormalDeleteButton(normalColumnRowList.indexOf(normalRuleRow))
         }
         normalTableView.items.also {
             it.clear()
             it.addAll(normalColumnRowList)
         }
+    }
+
+    /**
+     * 位置操作后要对按钮的index值进行更新
+     */
+    private fun refreshCrossRowList() {
+        crossRowList.forEach { crossRuleRow: CrossRuleRow ->
+            crossRuleRow.deleteButton = createCrossDeleteButton(48.0,30.0,crossRowList.indexOf(crossRuleRow))
+        }
+        crossTableView.items.also {
+            it.clear()
+            it.addAll(crossRowList)
+        }
+    }
+
+    override fun doCancel() {
+
+    }
+
+    override fun doSave() {
+
+    }
+
+    override fun doConfirm() {
+
     }
 }

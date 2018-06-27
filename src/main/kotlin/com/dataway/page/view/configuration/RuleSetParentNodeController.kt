@@ -49,6 +49,7 @@ class RuleSetParentNodeController : Initializable, BottomAction {
 
     var ruleSetConfigPath = "${System.getProperty("user.dir")}/conf/"
 
+    //规则集控制器
     private lateinit var ruleSetController: RuleSetController
 
     /**
