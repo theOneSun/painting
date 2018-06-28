@@ -750,7 +750,6 @@ class RuleSetChildNodeController : Initializable, BottomAction {
                 ruleSetProps = Props()
                 ruleSetProps = tempProps
 
-
                 ruleName = ruleNameTextField.text
 
                 ruleName?.let {
@@ -758,6 +757,7 @@ class RuleSetChildNodeController : Initializable, BottomAction {
                 }
             }
             showData()
+            ruleSetController.loadTreeData()
         } else {
             ruleNameTextField.text = ""
             ruleKeyWordTextField.text = ""
