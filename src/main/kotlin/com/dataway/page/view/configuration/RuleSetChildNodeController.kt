@@ -415,24 +415,24 @@ class RuleSetChildNodeController : Initializable, BottomAction {
         val maxValueColumn = createDoubleTableColumn(100.0, "最大值", "maxValue")
         maxValueColumn.setOnEditCommit {
             val selectedIndex = normalTableView.selectionModel.selectedIndex
-            normalColumnRowList[selectedIndex].maxValue =  it.newValue
+            normalColumnRowList[selectedIndex].maxValue = it.newValue
         }
         val minValueColumn = createDoubleTableColumn(100.0, "最小值", "minValue")
         minValueColumn.setOnEditCommit {
             val selectedIndex = normalTableView.selectionModel.selectedIndex
-            normalColumnRowList[selectedIndex].minValue =  it.newValue
+            normalColumnRowList[selectedIndex].minValue = it.newValue
         }
 
         val verifyColumn = createStringTableColumn(200.0, "数据校验值", "columnValues")
         verifyColumn.setOnEditCommit {
             val selectedIndex = normalTableView.selectionModel.selectedIndex
-            normalColumnRowList[selectedIndex].columnValues =  it.newValue
+            normalColumnRowList[selectedIndex].columnValues = it.newValue
         }
 
         val topValueColumn = createDoubleTableColumn(100.0, "取Top值", "columnTopValue")
         topValueColumn.setOnEditCommit {
             val selectedIndex = normalTableView.selectionModel.selectedIndex
-            normalColumnRowList[selectedIndex].columnTopValue =  it.newValue
+            normalColumnRowList[selectedIndex].columnTopValue = it.newValue
         }
 
         val upColumn = TableColumn<NormalRuleRow, Button>("上移")
@@ -739,7 +739,23 @@ class RuleSetChildNodeController : Initializable, BottomAction {
                 ruleName?.let { saveData(it) }
             } else {
                 //改了名字
+                //删除原来的key
+                val tempProps = Props()
+                for (entry in ruleSetProps.entries()) {
+                    //若是第二段key(规则名称)一致,不添加到临时的props中
+                    if (ruleName != entry.key.split(".")[1]) {
+                        tempProps.setValue(entry.key, entry.value)
+                    }
+                }
+                ruleSetProps = Props()
+                ruleSetProps = tempProps
 
+
+                ruleName = ruleNameTextField.text
+
+                ruleName?.let {
+                    saveData(it)
+                }
             }
             showData()
         } else {
@@ -780,34 +796,24 @@ class RuleSetChildNodeController : Initializable, BottomAction {
             columnNames.append("$columnName,")
             //数据校验值
             normalRuleRow.columnValues?.let {
-                //            normalRuleRow.columnValuesProperty?.let {
                 ruleSetProps.setValue("$keyPre.$RULE_COLUMN_VALUES.$ruleName", normalRuleRow.columnValues)
-//                ruleSetProps.setValue("$keyPre.$RULE_COLUMN_VALUES.$ruleName", normalRuleRow.columnValues.toString())
-//                ruleSetProps.setValue("$keyPre.$RULE_COLUMN_VALUES.$ruleName", normalRuleRow.columnValuesProperty.toString())
             }
             //包含列
-
             if (normalRuleRow.include.isSelected) {
                 includeColumns.append("$columnName,")
             }
             //最大值
             if (normalRuleRow.maxValue != null) {
-//            if (normalRuleRow.maxValueProperty != null) {
                 ruleSetProps.setValue("$keyPre.$RULE_CHECK_MAX_SCALE.$columnName", normalRuleRow.maxValue.toString())
-//                ruleSetProps.setValue("$keyPre.$RULE_CHECK_MAX_SCALE.$columnName", normalRuleRow.maxValueProperty.toString())
             }
             //最小值
             if (normalRuleRow.minValue != null) {
-//            if (normalRuleRow.minValueProperty != null) {
                 ruleSetProps.setValue("$keyPre.$RULE_CHECK_MIN_SCALE.$columnName", normalRuleRow.minValue.toString())
-//                ruleSetProps.setValue("$keyPre.$RULE_CHECK_MIN_SCALE.$columnName", normalRuleRow.minValueProperty.toString())
             }
 
             //top值
             if (normalRuleRow.columnTopValue != null) {
-//            if (normalRuleRow.columnTopValueProperty != null) {
                 ruleSetProps.setValue("$keyPre.$RULE_TOP_COLUMNS.$columnName", normalRuleRow.columnTopValue.toString())
-//                ruleSetProps.setValue("$keyPre.$RULE_TOP_COLUMNS.$columnName", normalRuleRow.columnTopValueProperty.toString())
             }
         }
         //所有列
