@@ -30,7 +30,7 @@
                         <Label contentDisplay="CENTER" prefHeight="40.0" prefWidth="120.0" text="规则名称" />
                         <Label prefHeight="40.0" prefWidth="226.0" text="生效关键字" GridPane.rowIndex="1" />
                         <TextField fx:id="ruleNameTextField" prefHeight="30.0" prefWidth="300.0" GridPane.columnIndex="1" />
-                        <TextField prefHeight="30.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <TextField fx:id="ruleKeyWordTextField" prefHeight="30.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                     </children>
                     <VBox.margin>
                         <Insets left="20.0" />

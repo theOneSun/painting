@@ -22,17 +22,20 @@ import javafx.collections.FXCollections
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.scene.control.Button
+import javafx.scene.control.CheckBox
 import javafx.scene.control.ChoiceBox
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
-import javafx.scene.control.cell.CheckBoxTableCell
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.control.cell.TextFieldTableCell
 import javafx.util.converter.DoubleStringConverter
 import jodd.props.Props
+import jodd.props.PropsConverter
 import org.apache.commons.lang3.StringUtils
+import org.springframework.util.ObjectUtils
 import java.io.File
+import java.io.FileWriter
 import java.net.URL
 import java.util.Collections
 import java.util.ResourceBundle
@@ -48,6 +51,8 @@ class RuleSetChildNodeController : Initializable, BottomAction {
     private lateinit var normalTableView: TableView<NormalRuleRow>
     @FXML
     private lateinit var crossTableView: TableView<CrossRuleRow>
+    @FXML
+    private lateinit var ruleKeyWordTextField: TextField//暂时不做处理
     //规则集控制器
     private lateinit var ruleSetController: RuleSetController
 
@@ -110,12 +115,17 @@ class RuleSetChildNodeController : Initializable, BottomAction {
      * 展示数据
      */
     private fun showData() {
+        normalTableView.columns.clear()
+        normalTableView.items.clear()
+
         ruleSetProps.load(File("$configPath/$ruleSetName.props"))
         val columns = ruleSetProps.getValue("$RULE_PREFIX.$ruleName.$RULE_COLUMN_NAMES")
         val includeColumns = ruleSetProps.getValue("$RULE_PREFIX.$ruleName.$RULE_INCLUDE_COLUMNS")
 
         //规则名称
         ruleNameTextField.text = ruleName
+        //生效关键字
+        //ruleKeyWordTextField.text =
 
         //循环显示列数据tableView
         convertColumnsToList(columns, includeColumns)
@@ -148,11 +158,11 @@ class RuleSetChildNodeController : Initializable, BottomAction {
         deleteColumn.isSortable = false
         deleteColumn.cellValueFactory = PropertyValueFactory("deleteButton")
 
-        val addButtonColumn = TableColumn<CrossRuleRow,String>("添加")
+        val addButtonColumn = TableColumn<CrossRuleRow, String>("添加")
         addButtonColumn.prefWidth = 48.0
         addButtonColumn.isSortable = false
         addButtonColumn.cellValueFactory = PropertyValueFactory("addButton")
-        crossTableView.columns.addAll(column1, column2, column3, maxScaleColumn,deleteColumn,addButtonColumn)
+        crossTableView.columns.addAll(column1, column2, column3, maxScaleColumn, deleteColumn, addButtonColumn)
     }
 
     /**
@@ -166,7 +176,7 @@ class RuleSetChildNodeController : Initializable, BottomAction {
         val crossColumnsMap = PropsUtils.getMapByPrefix(ruleSetProps, "$RULE_PREFIX.$ruleName.$RULE_CROSS_COLUMNS")
         println(crossColumnsMap)
         val optionList = names.split(",") as ArrayList
-        var groupIndex=0
+        var groupIndex = 0
         for (entry in crossColumnsMap) {
             /*
             遍历map
@@ -374,7 +384,7 @@ class RuleSetChildNodeController : Initializable, BottomAction {
             val lastKeyWord = keySplitList.last()
             crossRuleRow.maxScale = ruleSetProps.getValue("$RULE_PREFIX.$ruleName.$RULE_CROSS_MAX_SCALE.$lastKeyWord")?.toDouble()
 
-            crossRuleRow.deleteButton = this.createCrossDeleteButton(100.0,30.0,groupIndex++)
+            crossRuleRow.deleteButton = this.createCrossDeleteButton(100.0, 30.0, groupIndex++)
 //            crossRuleRow.addButton = this.createCrossAddButton(48.0,30.0)
             crossRowList.add(crossRuleRow)
         }
@@ -396,19 +406,34 @@ class RuleSetChildNodeController : Initializable, BottomAction {
     private fun initNormalTableView() {
 
         val nameColumn = createStringTableColumn(200.0, "文件列名", "columnName")
-        val includeColumn = TableColumn<NormalRuleRow, Boolean>("统计")
+        val includeColumn = TableColumn<NormalRuleRow, String>("统计")
         includeColumn.prefWidth = 80.0
         includeColumn.isSortable = false
-        includeColumn.cellFactory = CheckBoxTableCell.forTableColumn(includeColumn)
+//        includeColumn.cellFactory = CheckBoxTableCell.forTableColumn(includeColumn)
         includeColumn.cellValueFactory = PropertyValueFactory("include")
 
         val maxValueColumn = createDoubleTableColumn(100.0, "最大值", "maxValue")
-
+        maxValueColumn.setOnEditCommit {
+            val selectedIndex = normalTableView.selectionModel.selectedIndex
+            normalColumnRowList[selectedIndex].maxValue =  it.newValue
+        }
         val minValueColumn = createDoubleTableColumn(100.0, "最小值", "minValue")
+        minValueColumn.setOnEditCommit {
+            val selectedIndex = normalTableView.selectionModel.selectedIndex
+            normalColumnRowList[selectedIndex].minValue =  it.newValue
+        }
 
         val verifyColumn = createStringTableColumn(200.0, "数据校验值", "columnValues")
+        verifyColumn.setOnEditCommit {
+            val selectedIndex = normalTableView.selectionModel.selectedIndex
+            normalColumnRowList[selectedIndex].columnValues =  it.newValue
+        }
 
         val topValueColumn = createDoubleTableColumn(100.0, "取Top值", "columnTopValue")
+        topValueColumn.setOnEditCommit {
+            val selectedIndex = normalTableView.selectionModel.selectedIndex
+            normalColumnRowList[selectedIndex].columnTopValue =  it.newValue
+        }
 
         val upColumn = TableColumn<NormalRuleRow, Button>("上移")
         upColumn.prefWidth = 79.0
@@ -425,8 +450,11 @@ class RuleSetChildNodeController : Initializable, BottomAction {
         deleteColumn.isSortable = false
         deleteColumn.cellValueFactory = PropertyValueFactory("deleteButton")
 
-        normalTableView.columns.addAll(nameColumn, includeColumn, maxValueColumn, minValueColumn,
-                verifyColumn, topValueColumn, upColumn, downColumn, deleteColumn)
+        normalTableView.columns.also {
+            it.clear()
+            it.addAll(nameColumn, includeColumn, maxValueColumn, minValueColumn,
+                    verifyColumn, topValueColumn, upColumn, downColumn, deleteColumn)
+        }
 
         normalTableView.isEditable = true
         normalTableView.items.also { it.clear();it.addAll(normalColumnRowList) }
@@ -490,6 +518,8 @@ class RuleSetChildNodeController : Initializable, BottomAction {
      */
     private fun convertColumnsToList(columnNames: String?, includeColumns: String?) {
         val list = columnNames?.split(",")
+        columnList.clear()
+        normalColumnRowList.clear()
         list?.forEach { columnName ->
             columnList.add(columnName)
             val normalRuleRow = NormalRuleRow()
@@ -497,28 +527,31 @@ class RuleSetChildNodeController : Initializable, BottomAction {
             /* normalRuleRow.columnName = SimpleStringProperty(columnName)
              normalRuleRow.include.value = includeColumns?.contains(columnName)*/
             normalRuleRow.columnName = columnName
-            includeColumns?.contains(columnName)?.let {
-                normalRuleRow.include = it
-            }
+            normalRuleRow.include = CheckBox()
+            normalRuleRow.include.isSelected = includeColumns != null && includeColumns.contains(columnName)
+            /*includeColumns?.contains(columnName)?.let {
+                //normalRuleRow.include = it
+                normalRuleRow.include = CheckBox().also { it.isSelected = true }
+            }*/
             //最大最小值
             ruleSetProps.getValue("$RULE_PREFIX.$ruleName.$RULE_CHECK_MAX_SCALE.$columnName")?.toDouble()?.let {
-                //                normalRuleRow.maxValue = SimpleDoubleProperty(it)
+                //                                normalRuleRow.maxValueProperty = SimpleDoubleProperty(it)
                 normalRuleRow.maxValue = it
             }
 
             ruleSetProps.getValue("$RULE_PREFIX.$ruleName.$RULE_CHECK_MIN_SCALE.$columnName")?.toDouble()?.let {
-                //                normalRuleRow.minValue = SimpleDoubleProperty(it)
+                //                                normalRuleRow.minValueProperty = SimpleDoubleProperty(it)
                 normalRuleRow.minValue = it
             }
 
             //数据校验值
             ruleSetProps.getValue("$RULE_PREFIX.$ruleName.$RULE_COLUMN_VALUES.$columnName")?.let {
-                //                normalRuleRow.columnValues = SimpleStringProperty(it)
+                //                                normalRuleRow.columnValuesProperty = SimpleStringProperty(it)
                 normalRuleRow.columnValues = it
             }
             //top值
             ruleSetProps.getValue("$RULE_PREFIX.$ruleName.$RULE_TOP_COLUMNS.$columnName")?.toDouble()?.let {
-                //                normalRuleRow.columnTopValue = SimpleDoubleProperty(it)
+                //                                normalRuleRow.columnTopValueProperty = SimpleDoubleProperty(it)
                 normalRuleRow.columnTopValue = it
             }
 
@@ -584,10 +617,11 @@ class RuleSetChildNodeController : Initializable, BottomAction {
             }
         }
     }
+
     /**
      * 生成交叉页面中的删除按钮
      */
-    private fun createCrossDeleteButton(prefWidth: Double,prefHeight:Double,index: Int): Button {
+    private fun createCrossDeleteButton(prefWidth: Double, prefHeight: Double, index: Int): Button {
         return Button("删除").also {
             it.prefWidth = prefWidth
             it.prefHeight = prefHeight
@@ -603,7 +637,7 @@ class RuleSetChildNodeController : Initializable, BottomAction {
     /**
      * 生成交叉页面中的添加按钮
      */
-    private fun createCrossAddButton(prefWidth: Double,prefHeight:Double): Button {
+    private fun createCrossAddButton(prefWidth: Double, prefHeight: Double): Button {
         return Button("+").also {
             it.prefWidth = prefWidth
             it.prefHeight = prefHeight
@@ -617,10 +651,10 @@ class RuleSetChildNodeController : Initializable, BottomAction {
                 val optionList = names.split(",") as ArrayList
                 //设置被选中的行
                 val crossRuleRow = CrossRuleRow()
-                crossRuleRow.crossItemA = this.createChoiceBox(230.0,optionList,"")
-                crossRuleRow.crossItemB = this.createChoiceBox(230.0,optionList,"")
-                crossRuleRow.crossItemC = this.createChoiceBox(230.0,optionList,"")
-                crossRuleRow.deleteButton = this.createCrossDeleteButton(100.0,30.0,crossRowList.size)
+                crossRuleRow.crossItemA = this.createChoiceBox(230.0, optionList, "")
+                crossRuleRow.crossItemB = this.createChoiceBox(230.0, optionList, "")
+                crossRuleRow.crossItemC = this.createChoiceBox(230.0, optionList, "")
+                crossRuleRow.deleteButton = this.createCrossDeleteButton(100.0, 30.0, crossRowList.size)
 //                crossRuleRow.addButton = this.createCrossAddButton(prefWidth,prefHeight)
                 crossRowList.add(crossRuleRow)
                 //跟新数据
@@ -649,7 +683,7 @@ class RuleSetChildNodeController : Initializable, BottomAction {
      */
     private fun refreshCrossRowList() {
         crossRowList.forEach { crossRuleRow: CrossRuleRow ->
-            crossRuleRow.deleteButton = createCrossDeleteButton(48.0,30.0,crossRowList.indexOf(crossRuleRow))
+            crossRuleRow.deleteButton = createCrossDeleteButton(48.0, 30.0, crossRowList.indexOf(crossRuleRow))
         }
         crossTableView.items.also {
             it.clear()
@@ -658,14 +692,134 @@ class RuleSetChildNodeController : Initializable, BottomAction {
     }
 
     override fun doCancel() {
+        //判断是编辑还是新增
+        //新增初始化值,编辑重新加载
+        //重新加载此页
+        normalColumnRowList.clear()
+        crossRowList.clear()
+        normalTableView.columns.clear()
+        crossTableView.columns.clear()
+        crossTableView.items.clear()
+        if (editPage) {
 
+            showData()
+        } else {
+            ruleNameTextField.text = ""
+            ruleKeyWordTextField.text = ""
+            normalTableView.items.clear()
+            crossTableView.items.clear()
+        }
     }
 
     override fun doSave() {
-
+        this.doConfirm()
     }
 
     override fun doConfirm() {
+        /*
+        需要保存的:
+        1.ruleName file.name的name
+        2.所有文件列名 file.name.columns
+        3.数据校验值 columnValues.人群
+        4.统计(包含列) includeColumns
+        5.top值 topColumns.人群
+        6.最大值 checkMaxScale.人群
+        7.最小值 checkMinScale.人群
+         */
+        /*
+        分为编辑还是新增
+         */
+        if (editPage) {
+            //编辑
+            /*
+            判断是否改了规则名字
+             */
+            if (ruleName == ruleNameTextField.text) {
+                //没改名字
+                ruleName?.let { saveData(it) }
+            } else {
+                //改了名字
 
+            }
+            showData()
+        } else {
+            ruleNameTextField.text = ""
+            ruleKeyWordTextField.text = ""
+            normalTableView.items.clear()
+            crossTableView.items.clear()
+        }
+
+    }
+
+    /**
+     * 保存数据
+     */
+    private fun saveData(ruleName: String) {
+        /*
+        根据表格数据读取
+         */
+        val changedList = normalTableView.items
+
+        /*
+        需要保存的:
+        1.ruleName file.name的name
+        2.所有文件列名 file.name.columns
+        3.数据校验值 columnValues.人群
+        4.统计(包含列) includeColumns
+        5.top值 topColumns.人群
+        6.最大值 checkMaxScale.人群
+        7.最小值 checkMinScale.人群
+         */
+//        val saveProps = Props()
+        val keyPre = "$RULE_PREFIX.$ruleName"
+        val columnNames = StringBuilder()
+        val includeColumns = StringBuilder()
+        changedList.forEach { normalRuleRow ->
+            val columnName = normalRuleRow.columnName
+            //追加列
+            columnNames.append("$columnName,")
+            //数据校验值
+            normalRuleRow.columnValues?.let {
+                //            normalRuleRow.columnValuesProperty?.let {
+                ruleSetProps.setValue("$keyPre.$RULE_COLUMN_VALUES.$ruleName", normalRuleRow.columnValues)
+//                ruleSetProps.setValue("$keyPre.$RULE_COLUMN_VALUES.$ruleName", normalRuleRow.columnValues.toString())
+//                ruleSetProps.setValue("$keyPre.$RULE_COLUMN_VALUES.$ruleName", normalRuleRow.columnValuesProperty.toString())
+            }
+            //包含列
+
+            if (normalRuleRow.include.isSelected) {
+                includeColumns.append("$columnName,")
+            }
+            //最大值
+            if (normalRuleRow.maxValue != null) {
+//            if (normalRuleRow.maxValueProperty != null) {
+                ruleSetProps.setValue("$keyPre.$RULE_CHECK_MAX_SCALE.$columnName", normalRuleRow.maxValue.toString())
+//                ruleSetProps.setValue("$keyPre.$RULE_CHECK_MAX_SCALE.$columnName", normalRuleRow.maxValueProperty.toString())
+            }
+            //最小值
+            if (normalRuleRow.minValue != null) {
+//            if (normalRuleRow.minValueProperty != null) {
+                ruleSetProps.setValue("$keyPre.$RULE_CHECK_MIN_SCALE.$columnName", normalRuleRow.minValue.toString())
+//                ruleSetProps.setValue("$keyPre.$RULE_CHECK_MIN_SCALE.$columnName", normalRuleRow.minValueProperty.toString())
+            }
+
+            //top值
+            if (normalRuleRow.columnTopValue != null) {
+//            if (normalRuleRow.columnTopValueProperty != null) {
+                ruleSetProps.setValue("$keyPre.$RULE_TOP_COLUMNS.$columnName", normalRuleRow.columnTopValue.toString())
+//                ruleSetProps.setValue("$keyPre.$RULE_TOP_COLUMNS.$columnName", normalRuleRow.columnTopValueProperty.toString())
+            }
+        }
+        //所有列
+        if (!ObjectUtils.isEmpty(columnNames)) {
+            ruleSetProps.setValue("$keyPre.$RULE_COLUMN_NAMES", columnNames.substring(0, columnNames.length - 1).toString())
+        }
+        //包含列
+        if (!ObjectUtils.isEmpty(includeColumns)) {
+            ruleSetProps.setValue("$keyPre.$RULE_INCLUDE_COLUMNS", includeColumns.substring(0, includeColumns.length - 1).toString())
+        }
+
+        val orderedProperties = PropsUtils.convertOrderProperties(ruleSetProps)
+        PropsConverter.convert(FileWriter("$configPath/$ruleSetName.props"), orderedProperties)
     }
 }
