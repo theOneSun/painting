@@ -66,6 +66,8 @@ const val RULE_TOP_COLUMNS = "topColumns"
 
 //交叉规则的配置
 const val RULE_CROSS_COLUMNS = "crossColumns"
+
+const val RULE_CROSS_COLUMNS_GROUP = "group"
 //交叉最大比例
 const val RULE_CROSS_MAX_SCALE = "crossCheckMaxScale"
 

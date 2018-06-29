@@ -12,6 +12,7 @@ import com.dataway.page.view.selfdefine.RULE_CHECK_MIN_SCALE
 import com.dataway.page.view.selfdefine.RULE_COLUMN_NAMES
 import com.dataway.page.view.selfdefine.RULE_COLUMN_VALUES
 import com.dataway.page.view.selfdefine.RULE_CROSS_COLUMNS
+import com.dataway.page.view.selfdefine.RULE_CROSS_COLUMNS_GROUP
 import com.dataway.page.view.selfdefine.RULE_CROSS_MAX_SCALE
 import com.dataway.page.view.selfdefine.RULE_INCLUDE_COLUMNS
 import com.dataway.page.view.selfdefine.RULE_PREFIX
@@ -175,7 +176,7 @@ class RuleSetChildNodeController : Initializable, BottomAction {
 
         //读取已有的配置
         val crossColumnsMap = PropsUtils.getMapByPrefix(ruleSetProps, "$RULE_PREFIX.$ruleName.$RULE_CROSS_COLUMNS")
-        println("crossColumnsMap$crossColumnsMap")
+
         var optionList = arrayListOf<String>()
         if (names != null){
             optionList = names.split(",") as ArrayList
@@ -806,6 +807,7 @@ class RuleSetChildNodeController : Initializable, BottomAction {
         根据表格数据读取
          */
         val changedList = normalTableView.items
+        val crossChangedList = crossTableView.items
 
         /*
         需要保存的:
@@ -816,6 +818,9 @@ class RuleSetChildNodeController : Initializable, BottomAction {
         5.top值 topColumns.人群
         6.最大值 checkMaxScale.人群
         7.最小值 checkMinScale.人群
+
+        1.交叉项1,2,3
+        2.交叉最大比例
          */
 //        val saveProps = Props()
         val keyPre = "$RULE_PREFIX.$ruleName"
@@ -854,6 +859,20 @@ class RuleSetChildNodeController : Initializable, BottomAction {
         //包含列
         if (!ObjectUtils.isEmpty(includeColumns)) {
             ruleSetProps.setValue("$keyPre.$RULE_INCLUDE_COLUMNS", includeColumns.substring(0, includeColumns.length - 1).toString())
+        }
+
+        var groupIndex = 1
+        crossChangedList.forEach{
+            it->
+            val itemKey = "$keyPre.$RULE_CROSS_COLUMNS.$RULE_CROSS_COLUMNS_GROUP$groupIndex"
+            val maxScaleKey = "$keyPre.$RULE_CROSS_MAX_SCALE.$RULE_CROSS_COLUMNS_GROUP$groupIndex"
+            val itemValue = "${it.crossItemA.selectionModel.selectedItem},${it.crossItemB.selectionModel.selectedItem},${it.crossItemC.selectionModel.selectedItem}"
+
+            val maxScaleValue = it.maxScale.toString()
+            ruleSetProps.setValue(itemKey,itemValue)
+
+            ruleSetProps.setValue(maxScaleKey,maxScaleValue)
+            groupIndex++
         }
 
         val orderedProperties = PropsUtils.convertOrderProperties(ruleSetProps)
