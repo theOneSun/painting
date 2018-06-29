@@ -12,5 +12,5 @@ class CrossRuleRow {
     lateinit var crossItemC: ChoiceBox<String>
     var maxScale: Double? = null
     lateinit var deleteButton: Button
-    var addButton: Button? = null
+//    var addButton: Button? = null
 }

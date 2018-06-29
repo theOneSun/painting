@@ -55,6 +55,11 @@ class RuleSetChildNodeController : Initializable, BottomAction {
     private lateinit var crossTableView: TableView<CrossRuleRow>
     @FXML
     private lateinit var ruleKeyWordTextField: TextField//暂时不做处理
+    @FXML
+    private lateinit var normalAddButton: Button
+    @FXML
+    private lateinit var crossAddButton: Button
+
     //规则集控制器
     private lateinit var ruleSetController: RuleSetController
 
@@ -65,6 +70,8 @@ class RuleSetChildNodeController : Initializable, BottomAction {
 
     //常规列名集合
     private var columnList: ArrayList<String> = arrayListOf()
+    // 交叉页面的可选项
+    private var optionList = arrayListOf<String>()
     //规则集配置文件对象
     private var ruleSetProps: Props = Props()
     private var ruleName: String? = null//默认没有选中规则,因为可能是新建规则
@@ -82,6 +89,21 @@ class RuleSetChildNodeController : Initializable, BottomAction {
         ruleName = LeoContext.getValue(SELECTED_RULE) as String?
         ruleSetName = LeoContext.getValue(SELECTED_RULE_PARENT_RULE_SET) as String
         ruleSetProps.load(File("$configPath/$ruleSetName.props"))
+
+        //读取常规配置的列名
+        val names = ruleSetProps.getValue("$RULE_PREFIX.$ruleName.$RULE_COLUMN_NAMES")
+
+        if (names != null) {
+            val splitList = names.split(",")
+            if (splitList.size>1){
+                optionList = splitList as ArrayList
+            }else{
+                optionList.add(splitList[0])
+            }
+
+        }
+        optionList.add(0, "")
+
         if (StringUtils.isBlank(ruleName)) {
             editPage = false
             //初始化表格数据
@@ -93,7 +115,7 @@ class RuleSetChildNodeController : Initializable, BottomAction {
         }
 
 
-        /*//todo 根据规则集名称查询配置文件,返回props对象
+        /*// 根据规则集名称查询配置文件,返回props对象
 
         ruleSetProps.load(File("$configPath/$ruleSetName.props"))
         val columns = ruleSetProps.getValue("$RULE_PREFIX.$ruleName.$RULE_COLUMN_NAMES")
@@ -107,9 +129,45 @@ class RuleSetChildNodeController : Initializable, BottomAction {
 
         //初始化表格数据
         initNormalTableView()
-        //todo 初始化交叉项表格
+        // 初始化交叉项表格
         initCrossTableView()
-        //todo 根据规则名称查询生效关键字*/
+        // 根据规则名称查询生效关键字*/
+
+        // 添加按钮初始化
+        normalAddButton.setOnAction {
+            val normalRuleRow = NormalRuleRow()
+            normalRuleRow.columnName = ""
+            normalRuleRow.include = CheckBox()
+            normalRuleRow.maxValue = null
+            normalRuleRow.minValue = null
+            normalColumnRowList.size.let {
+                normalRuleRow.upButton = createUpButton(it)
+                normalRuleRow.downButton = createDownButton(it)
+                normalRuleRow.deleteButton = createNormalDeleteButton(it)
+            }
+            normalRuleRow.columnTopValue = null
+            normalRuleRow.columnValues = null
+
+            normalColumnRowList.add(normalRuleRow)
+            normalTableView.items.clear()
+            normalTableView.items.addAll(normalColumnRowList)
+        }
+
+        crossAddButton.setOnAction {
+            val crossRuleRow = CrossRuleRow()
+
+            crossRuleRow.crossItemA = createChoiceBox(233.0, optionList, "")
+            crossRuleRow.crossItemB = createChoiceBox(233.0, optionList, "")
+            crossRuleRow.crossItemC = createChoiceBox(233.0, optionList, "")
+            crossRuleRow.maxScale = null
+            crossRuleRow.deleteButton = createCrossDeleteButton(100.0, 30.0, optionList.size)
+
+            crossRowList.add(crossRuleRow)
+            crossTableView.items.also {
+                it.clear()
+                it.addAll(crossRowList)
+            }
+        }
 
     }
 
@@ -155,32 +213,37 @@ class RuleSetChildNodeController : Initializable, BottomAction {
         maxScaleColumn.cellFactory = TextFieldTableCell.forTableColumn(DoubleStringConverter())
         maxScaleColumn.cellValueFactory = PropertyValueFactory("maxScale")
 
+        maxScaleColumn.setOnEditCommit {
+            val selectedIndex = crossTableView.selectionModel.selectedIndex
+            crossRowList[selectedIndex].maxScale = it.newValue
+        }
+
+
         val deleteColumn = TableColumn<CrossRuleRow, String>("删除")
-        deleteColumn.prefWidth = 100.0
+        deleteColumn.prefWidth = 148.0
         deleteColumn.isSortable = false
         deleteColumn.cellValueFactory = PropertyValueFactory("deleteButton")
 
-        val addButtonColumn = TableColumn<CrossRuleRow, String>("添加")
+        /*val addButtonColumn = TableColumn<CrossRuleRow, String>("添加")
         addButtonColumn.prefWidth = 48.0
         addButtonColumn.isSortable = false
-        addButtonColumn.cellValueFactory = PropertyValueFactory("addButton")
-        crossTableView.columns.addAll(column1, column2, column3, maxScaleColumn, deleteColumn, addButtonColumn)
+        addButtonColumn.cellValueFactory = PropertyValueFactory("addButton")*/
+        crossTableView.columns.addAll(column1, column2, column3, maxScaleColumn, deleteColumn)
     }
 
     /**
      * 展示交叉的数据
      */
     private fun showCrossTableView() {
-        //读取常规配置的列名
+        /*//读取常规配置的列名
         val names = ruleSetProps.getValue("$RULE_PREFIX.$ruleName.$RULE_COLUMN_NAMES")
 
-        //读取已有的配置
-        val crossColumnsMap = PropsUtils.getMapByPrefix(ruleSetProps, "$RULE_PREFIX.$ruleName.$RULE_CROSS_COLUMNS")
-
-        var optionList = arrayListOf<String>()
-        if (names != null){
+        if (names != null) {
             optionList = names.split(",") as ArrayList
         }
+        optionList.add(0, "")*/
+        //读取已有的配置
+        val crossColumnsMap = PropsUtils.getMapByPrefix(ruleSetProps, "$RULE_PREFIX.$ruleName.$RULE_CROSS_COLUMNS")
         var groupIndex = 0
         for (entry in crossColumnsMap) {
             /*
@@ -193,7 +256,6 @@ class RuleSetChildNodeController : Initializable, BottomAction {
             val rowSelectedList = rowColumns.split(",")
             val crossRuleRow = CrossRuleRow()
             //可选择的选项列表
-            optionList.add(0, "")
 
             var j = 1
             //循环配置文件中的值,展示已经选择的交叉项
@@ -411,6 +473,10 @@ class RuleSetChildNodeController : Initializable, BottomAction {
     private fun initNormalTableView() {
 
         val nameColumn = createStringTableColumn(200.0, "文件列名", "columnName")
+        nameColumn.setOnEditCommit {
+            val selectedIndex = normalTableView.selectionModel.selectedIndex
+            normalColumnRowList[selectedIndex].columnName = it.newValue
+        }
         val includeColumn = TableColumn<NormalRuleRow, String>("统计")
         includeColumn.prefWidth = 80.0
         includeColumn.isSortable = false
@@ -566,7 +632,7 @@ class RuleSetChildNodeController : Initializable, BottomAction {
             normalRuleRow.downButton = createDownButton(list.indexOf(columnName))
 
             //删除
-            normalRuleRow.deleteButton = Button("删除这行")
+            normalRuleRow.deleteButton = createNormalDeleteButton(list.indexOf(columnName))
             //添加到属性的集合中
             normalColumnRowList.add(normalRuleRow)
 
@@ -688,7 +754,7 @@ class RuleSetChildNodeController : Initializable, BottomAction {
      */
     private fun refreshCrossRowList() {
         crossRowList.forEach { crossRuleRow: CrossRuleRow ->
-            crossRuleRow.deleteButton = createCrossDeleteButton(48.0, 30.0, crossRowList.indexOf(crossRuleRow))
+            crossRuleRow.deleteButton = createCrossDeleteButton(100.0, 30.0, crossRowList.indexOf(crossRuleRow))
         }
         crossTableView.items.also {
             it.clear()
@@ -862,16 +928,18 @@ class RuleSetChildNodeController : Initializable, BottomAction {
         }
 
         var groupIndex = 1
-        crossChangedList.forEach{
-            it->
+        crossChangedList.forEach { it ->
+            //三个交叉项
             val itemKey = "$keyPre.$RULE_CROSS_COLUMNS.$RULE_CROSS_COLUMNS_GROUP$groupIndex"
-            val maxScaleKey = "$keyPre.$RULE_CROSS_MAX_SCALE.$RULE_CROSS_COLUMNS_GROUP$groupIndex"
             val itemValue = "${it.crossItemA.selectionModel.selectedItem},${it.crossItemB.selectionModel.selectedItem},${it.crossItemC.selectionModel.selectedItem}"
+            ruleSetProps.setValue(itemKey, itemValue)
 
-            val maxScaleValue = it.maxScale.toString()
-            ruleSetProps.setValue(itemKey,itemValue)
+            //交叉最大比例
+            val maxScaleKey = "$keyPre.$RULE_CROSS_MAX_SCALE.$RULE_CROSS_COLUMNS_GROUP$groupIndex"
+            if (it.maxScale!=null){
+                ruleSetProps.setValue(maxScaleKey, it.maxScale.toString())
+            }
 
-            ruleSetProps.setValue(maxScaleKey,maxScaleValue)
             groupIndex++
         }
 
