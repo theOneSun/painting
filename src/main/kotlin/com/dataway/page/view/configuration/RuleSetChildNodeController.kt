@@ -2,6 +2,7 @@ package com.dataway.page.view.configuration
 
 import com.dataway.page.model.CrossRuleRow
 import com.dataway.page.model.NormalRuleRow
+import com.dataway.page.util.DialogFactory
 import com.dataway.page.util.PropsUtils
 import com.dataway.page.view.selfdefine.BottomAction
 import com.dataway.page.view.selfdefine.CURRENT_BOTTOM_ACTION
@@ -79,7 +80,7 @@ class RuleSetChildNodeController : Initializable, BottomAction {
         //判断是编辑页还是添加规则
         ruleName = LeoContext.getValue(SELECTED_RULE) as String?
         ruleSetName = LeoContext.getValue(SELECTED_RULE_PARENT_RULE_SET) as String
-
+        ruleSetProps.load(File("$configPath/$ruleSetName.props"))
         if (StringUtils.isBlank(ruleName)) {
             editPage = false
             //初始化表格数据
@@ -174,8 +175,11 @@ class RuleSetChildNodeController : Initializable, BottomAction {
 
         //读取已有的配置
         val crossColumnsMap = PropsUtils.getMapByPrefix(ruleSetProps, "$RULE_PREFIX.$ruleName.$RULE_CROSS_COLUMNS")
-        println(crossColumnsMap)
-        val optionList = names.split(",") as ArrayList
+        println("crossColumnsMap$crossColumnsMap")
+        var optionList = arrayListOf<String>()
+        if (names != null){
+            optionList = names.split(",") as ArrayList
+        }
         var groupIndex = 0
         for (entry in crossColumnsMap) {
             /*
@@ -737,34 +741,61 @@ class RuleSetChildNodeController : Initializable, BottomAction {
             if (ruleName == ruleNameTextField.text) {
                 //没改名字
                 ruleName?.let { saveData(it) }
+                showData()
+                ruleSetController.loadTreeData()
             } else {
                 //改了名字
-                //删除原来的key
-                val tempProps = Props()
-                for (entry in ruleSetProps.entries()) {
-                    //若是第二段key(规则名称)一致,不添加到临时的props中
-                    if (ruleName != entry.key.split(".")[1]) {
-                        tempProps.setValue(entry.key, entry.value)
-                    }
-                }
-                ruleSetProps = Props()
-                ruleSetProps = tempProps
-
                 ruleName = ruleNameTextField.text
+                val oldRuleName = LeoContext.getValue(SELECTED_RULE) as String?
+                /*
+                判断新的名字是否有重复的
+                 */
+                if (!PropsUtils.containsSubKey(ruleSetProps, 1, ruleName)) {
+                    //规则名称不重复可以添加
+                    //删除原来的key
+                    val tempProps = Props()
+                    for (entry in ruleSetProps.entries()) {
+                        //若是第二段key(规则名称)一致,不添加到临时的props中
+                        if (oldRuleName != entry.key.split(".")[1]) {
+                            tempProps.setValue(entry.key, entry.value)
+                        }
+                    }
+                    ruleSetProps = Props()
+                    ruleSetProps = tempProps
+                    ruleName?.let { saveData(it) }
+                    showData()
+                    ruleSetController.loadTreeData()
+                } else {
+                    //跟原来名字有重复的
+                    val errorDialog = DialogFactory.createErrorDialog("", "该规则已存在!")
+                    errorDialog.showAndWait()
+                }
 
-                ruleName?.let {
-                    saveData(it)
+            }
+
+        } else {
+            //新增,判断名字有没有
+            ruleName = ruleNameTextField.text
+            if (StringUtils.isBlank(ruleName)) {
+                //规则名称为空
+                val errorDialog = DialogFactory.createErrorDialog("", "规则名称不能为空!")
+                errorDialog.showAndWait()
+            } else {
+                //规则名称不为空
+                /*
+                判断有没有重复的
+                 */
+                if (PropsUtils.containsSubKey(ruleSetProps, 1, ruleName)) {
+                    //包含不能添加
+                    val errorDialog = DialogFactory.createErrorDialog("", "该规则已存在!")
+                    errorDialog.showAndWait()
+                } else {
+                    ruleName?.let { saveData(it) }
+                    showData()
+                    ruleSetController.loadTreeData()
                 }
             }
-            showData()
-            ruleSetController.loadTreeData()
-        } else {
-            ruleNameTextField.text = ""
-            ruleKeyWordTextField.text = ""
-            normalTableView.items.clear()
-            crossTableView.items.clear()
         }
-
     }
 
     /**

@@ -2,6 +2,7 @@ package com.dataway.page.util
 
 import com.dataway.page.view.selfdefine.OrderedProperties
 import jodd.props.Props
+import org.apache.commons.lang3.StringUtils
 import java.util.Collections
 import java.util.Properties
 
@@ -29,7 +30,7 @@ object PropsUtils {
         //对key进行排序
         val keyList = mutableListOf<String>()
 
-        for (entry in props.entries()){
+        for (entry in props.entries()) {
             keyList.add(entry.key)
         }
 
@@ -48,7 +49,7 @@ object PropsUtils {
         //对key进行排序
         val keyList = mutableListOf<String>()
 
-        for (entry in props.entries()){
+        for (entry in props.entries()) {
             keyList.add(entry.key)
         }
 
@@ -57,5 +58,20 @@ object PropsUtils {
             properties.setProperty(key, props.getValue(key))
         }
         return properties
+    }
+
+    /**
+     *  props中的key的指定部分是否是有指定的key值
+     *  @return 有返回true;没有返回false
+     */
+    fun containsSubKey(props: Props, subKeyIndex: Int, targetKey: String?): Boolean {
+        if (StringUtils.isNotBlank(targetKey)) {
+            for (entry in props.entries()) {
+                if (entry.key.split(".")[subKeyIndex] == targetKey) {
+                    return true
+                }
+            }
+        }
+        return false
     }
 }

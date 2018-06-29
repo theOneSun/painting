@@ -9,6 +9,8 @@ import javafx.scene.control.ButtonType
  * @author sunjian.
  */
 object DialogFactory {
+    var height:Double = 500.0
+    var width:Double = 500.0
      fun createWarnDialog(height:Double,width:Double,title:String,contentText:String):Alert{
          val warnDialog = Alert(Alert.AlertType.WARNING)
          warnDialog.height = height
@@ -18,6 +20,14 @@ object DialogFactory {
          return warnDialog
      }
     fun createErrorDialog(height:Double,width:Double,title:String,contentText:String):Alert{
+        val errorDialog = Alert(Alert.AlertType.ERROR)
+        errorDialog.height = height
+        errorDialog.width = width
+        errorDialog.contentText = contentText
+//        errorDialog.showAndWait()
+        return errorDialog
+    }
+    fun createErrorDialog(title:String,contentText:String):Alert{
         val errorDialog = Alert(Alert.AlertType.ERROR)
         errorDialog.height = height
         errorDialog.width = width
