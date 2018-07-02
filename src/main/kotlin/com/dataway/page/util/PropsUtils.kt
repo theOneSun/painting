@@ -74,4 +74,18 @@ object PropsUtils {
         }
         return false
     }
+
+    /**
+     * props中是否有指定的key
+     */
+    fun containsKey(props: Props, key:String):Boolean{
+        if (StringUtils.isNotBlank(key)) {
+            for (entry in props.entries()) {
+                if (entry.key == key) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
 }

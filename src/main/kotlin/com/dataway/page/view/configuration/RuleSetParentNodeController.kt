@@ -1,5 +1,6 @@
 package com.dataway.page.view.configuration
 
+import com.dataway.page.model.VerifyRuleRow
 import com.dataway.page.util.DialogFactory
 import com.dataway.page.util.PropsUtils
 import com.dataway.page.view.selfdefine.BottomAction
@@ -8,6 +9,7 @@ import com.dataway.page.view.selfdefine.LeoContext
 import com.dataway.page.view.selfdefine.RULE_PREFIX
 import com.dataway.page.view.selfdefine.RULE_SET_CONTROLLER
 import com.dataway.page.view.selfdefine.RULE_SET_VERIFY_COLUMN
+import com.dataway.page.view.selfdefine.RULE_SET_VERIFY_RULES
 import com.dataway.page.view.selfdefine.SELECTED_RULE_SET
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
@@ -15,7 +17,10 @@ import javafx.scene.control.Button
 import javafx.scene.control.ChoiceBox
 import javafx.scene.control.Label
 import javafx.scene.control.ListView
+import javafx.scene.control.TableColumn
+import javafx.scene.control.TableView
 import javafx.scene.control.TextField
+import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.layout.ColumnConstraints
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.RowConstraints
@@ -23,6 +28,7 @@ import javafx.scene.layout.VBox
 import jodd.props.Props
 import jodd.props.PropsConverter
 import org.apache.commons.lang3.StringUtils
+import org.springframework.util.ObjectUtils
 import java.io.File
 import java.io.FileWriter
 import java.net.URL
@@ -46,6 +52,12 @@ class RuleSetParentNodeController : Initializable, BottomAction {
     private lateinit var ruleSetNameTextField: TextField
     @FXML
     private lateinit var verifyColumnTextField: TextField
+    @FXML
+    private lateinit var verifyRuleTableView: TableView<VerifyRuleRow>
+    @FXML
+    private lateinit var addButton: Button
+
+    private var verifyRuleRowList = arrayListOf<VerifyRuleRow>()
 
     var ruleSetConfigPath = "${System.getProperty("user.dir")}/conf/"
 
@@ -70,13 +82,39 @@ class RuleSetParentNodeController : Initializable, BottomAction {
         }
         ruleSetNameTextField.text = ruleSetName
 
-        //todo 验证列名(根据规则集名称查询其验证列名)
-
-        //todo 验证规则:根据规则集名称查询其验证规则 --choiceBox初始化
-
-
-        //todo gridPane初始化
+        // gridPane初始化
         showVerifyGridPane()
+        addButton.setOnAction {
+            /*
+            获取choiceBox的选中项
+            根据这个选中项查询是否已经在配置过了
+            添加先暂时添加到表格中
+             */
+            val selectedItem = verifyRuleChoiceBox.selectionModel.selectedItem
+            var have = false
+            verifyRuleRowList.forEach { verifyRuleRow ->
+                if (verifyRuleRow.ruleName == selectedItem) {
+                    have = true
+                }
+            }
+            if (have) {
+                val errorDialog = DialogFactory.createErrorDialog("", "不能重复添加")
+                errorDialog.showAndWait()
+            } else {
+                /*ruleSetProps = Props()
+                ruleSetProps.load(File("$ruleSetConfigPath$ruleSetName.props"))
+                PropsUtils.containsKey(RULE_SET_VERIFY_RULES)*/
+                verifyRuleRowList.add(VerifyRuleRow().also {
+                    it.ruleName = selectedItem
+                    it.deleteButton = createDeleteButton(verifyRuleRowList.size)
+                })
+                refreshRowList()
+            }
+
+        }
+        // 验证规则表格
+        initVerifyRulesTableView()
+
 
         //todo 支持库listView初始化 根据规则集名称查询其支持库
 
@@ -85,32 +123,22 @@ class RuleSetParentNodeController : Initializable, BottomAction {
         this.showData(ruleSetName)
     }
 
-    private fun loopAdd() {
-        var ruleList = ArrayList<String>()
-        for (i in 3..20) {
-            ruleList.add("验证规则$i")
-        }
+    /**
+     * 初始化验证规则表格
+     */
+    private fun initVerifyRulesTableView() {
+        val nameColumn = TableColumn<VerifyRuleRow, String>()
+        nameColumn.prefWidth = 350.0
+        nameColumn.isEditable = false
+        nameColumn.isSortable = false
+        nameColumn.cellValueFactory = PropertyValueFactory("ruleName")
+        val deleteColumn = TableColumn<VerifyRuleRow, String>()
+        deleteColumn.prefWidth = 50.0
+        deleteColumn.isSortable = false
+        deleteColumn.cellValueFactory = PropertyValueFactory("deleteButton")
 
-        for (i in ruleList.indices) {
-            val rowConstraints = RowConstraints(40.0)
+        verifyRuleTableView.columns.addAll(nameColumn, deleteColumn)
 
-            verifyGridPane.rowConstraints.add(rowConstraints)
-            val label = Label("电视剧使用习惯${i + 3}")
-            label.prefHeight = 36.0
-            label.prefWidth = 198.0
-
-            val button = Button("D")
-            button.id = "delete${i + 3}"
-            button.setOnMouseClicked {
-                println("删除这行")
-//                verifyGridPane.rowConstraints.removeAt(i+3)
-                ruleList.remove(ruleList[i])
-                verifyGridPane.rowConstraints.clear()
-                loopAdd()
-            }
-            verifyGridPane.add(label, 1, i + 3)
-            verifyGridPane.add(button, 2, i + 3)
-        }
     }
 
     //取消按钮
@@ -146,8 +174,10 @@ class RuleSetParentNodeController : Initializable, BottomAction {
                 val props = Props()
 
                 props.load(File(fileName))
-
+                //设置验证列名
                 props.setValue(RULE_SET_VERIFY_COLUMN, verifyColumn)
+                //设置验证规则
+                this.setVerifyRulesToProps(props)
 //            val orderedProperties = PropsUtils.convertProperties(props)
                 val orderedProperties = PropsUtils.convertOrderProperties(props)
 //                orderedProperties.keys
@@ -168,10 +198,14 @@ class RuleSetParentNodeController : Initializable, BottomAction {
                     val props = Props()
 
                     props.load(File(oldFileName))
+                    //设置验证列名
                     props.setValue(RULE_SET_VERIFY_COLUMN, verifyColumn)
-                    val orderedProperties = PropsUtils.convertOrderProperties(props)
+                    //设置验证规则
+                    this.setVerifyRulesToProps(props)
+
                     //todo 其它属性添加
 
+                    val orderedProperties = PropsUtils.convertOrderProperties(props)
                     //存储的时候再转成props
                     PropsConverter.convert(FileWriter(fileName), orderedProperties)
                     //保存新的规则集名称
@@ -184,13 +218,14 @@ class RuleSetParentNodeController : Initializable, BottomAction {
 
             //验证列名
             println("验证列名$verifyColumn")
+
             //验证规则
 
             // 更新页面数据
             this.showData(ruleSetName)
         } else {
 
-            //todo 新增 将所有数据保存到properties中并生成文件
+            // 新增 将所有数据保存到properties中并生成文件
             val ruleSetFile = File(fileName)
             if (ruleSetFile.exists()) {
                 //修改的名称已存在不可以修改
@@ -201,10 +236,11 @@ class RuleSetParentNodeController : Initializable, BottomAction {
             }
             //规则集名称
 
-            //验证列名
-            println("验证列名$verifyColumn")
             val props = Props()
+            //验证列名
             props.setValue(RULE_SET_VERIFY_COLUMN, verifyColumn)
+            //验证规则
+            this.setVerifyRulesToProps(props)
             //todo 其他数据
 
             val orderedProperties = PropsUtils.convertOrderProperties(props)
@@ -213,13 +249,28 @@ class RuleSetParentNodeController : Initializable, BottomAction {
             PropsConverter.convert(FileWriter(fileName), orderedProperties)
         }
 
-        //TODO 更新树结构
-
+        // 更新树结构
         ruleSetController.loadTreeData()
 
     }
 
-    //todo 初始化gridPane,参数待定
+    /**
+     * 设置参与验证的规则
+     */
+    private fun setVerifyRulesToProps(props: Props) {
+        val itemList = verifyRuleTableView.items
+        val verifyRulesValue = StringBuilder()
+        for (item in itemList) {
+            verifyRulesValue.append("${item.ruleName},")
+        }
+        //最后是逗号删除逗号
+        if (verifyRulesValue.lastIndexOf(",") == verifyRulesValue.length - 1) {
+            verifyRulesValue.delete(verifyRulesValue.length - 1, verifyRulesValue.length)
+        }
+        props.setValue(RULE_SET_VERIFY_RULES, verifyRulesValue.toString())
+    }
+
+    // 初始化gridPane
     private fun showVerifyGridPane() {
 
         // 初始化列,3列
@@ -242,15 +293,14 @@ class RuleSetParentNodeController : Initializable, BottomAction {
                 }
                 .let { verifyGridPane.add(it, 0, 1) }
 
-        ChoiceBox<String>()
-                .also {
-                    it.id = "verifyRuleChoiceBox"
-                    it.prefHeight = 30.0
-                    it.prefWidth = 200.0
-                    it.insets
-
-                }
-                .let { verifyGridPane.add(it, 1, 1) }
+//        ChoiceBox<String>()
+//                .also {
+//                    it.id = "verifyRuleChoiceBox"
+//                    it.prefHeight = 30.0
+//                    it.prefWidth = 200.0
+////                    it.insets
+//                }
+//                .let { verifyGridPane.add(it, 1, 1) }
 
     }
 
@@ -265,26 +315,63 @@ class RuleSetParentNodeController : Initializable, BottomAction {
             props.load(File("$ruleSetConfigPath$ruleSetName.props"))
             //验证列名
             verifyColumnTextField.text = props.getValue(RULE_SET_VERIFY_COLUMN)
-            //todo 验证规则
-            val ruleList = arrayListOf<String>()
+            // 验证规则
+            val ruleSet = LinkedHashSet<String>()
             val rulePropertyMap = PropsUtils.getMapByPrefix(props, RULE_PREFIX)
             for (entry in rulePropertyMap.entries) {
-                ruleList.add(entry.key.split(".")[1])
+                ruleSet.add(entry.key.split(".")[1])
             }
+            //选择框
+            verifyRuleChoiceBox.items.addAll(ruleSet)
+            //tableView展示
+            if (PropsUtils.containsKey(props, RULE_SET_VERIFY_RULES)) {
+                //如果有这个key值
+                val verifyRules = props.getValue(RULE_SET_VERIFY_RULES)
+
+                val splitList = verifyRules.split(",")
+                if (!ObjectUtils.isEmpty(splitList)) {
+                    for (i in splitList.indices) {
+                        val verifyRuleRow = VerifyRuleRow()
+                        verifyRuleRow.ruleName = splitList[i]
+                        verifyRuleRow.deleteButton = createDeleteButton(i)
+                        verifyRuleRowList.add(verifyRuleRow)
+                    }
+                }
+                verifyRuleTableView.items.addAll(verifyRuleRowList)
+            }
+
 
             //todo 支持库
         }
     }
 
+    /**
+     * 创建验证规则table的删除按钮
+     */
     private fun createDeleteButton(rowIndex: Int): Button {
         val button = Button("D")
 //        maxWidth="30.0" mnemonicParsing="false" prefHeight="30.0" text="D" GridPane.columnIndex="2" GridPane.rowIndex="2"
         button.maxWidth = 30.0
         button.prefHeight = 30.0
         button.setOnAction {
-
+            verifyRuleTableView.selectionModel.select(rowIndex)
+            verifyRuleRowList.removeAt(rowIndex)
+            refreshRowList()
         }
         return button
+    }
+
+    /**
+     * 删除操作后需要对index值进行更新
+     */
+    private fun refreshRowList() {
+        verifyRuleRowList.forEach { it ->
+            it.deleteButton = createDeleteButton(verifyRuleRowList.indexOf(it))
+        }
+        verifyRuleTableView.items.also {
+            it.clear()
+            it.addAll(verifyRuleRowList)
+        }
     }
 
     /*private fun loadProps(propsFile: File,verifyColumn:String){

@@ -75,6 +75,8 @@ const val RULE_CROSS_MIN_SCALE = "crossCheckMinScale"
 
 //规则集验证列名
 const val RULE_SET_VERIFY_COLUMN = "ruleSet.verifyColumn"
+//规则集验证规则
+const val RULE_SET_VERIFY_RULES = "ruleSet.verifyRules"
 
 //------------------------------------
 
