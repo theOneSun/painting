@@ -8,5 +8,4 @@ import javafx.scene.control.Button
 class VerifyRuleRow {
     lateinit var ruleName: String
     lateinit var deleteButton: Button
-
 }

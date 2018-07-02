@@ -44,9 +44,6 @@ class ConfigurationBaseController : Initializable {
     @FXML
     private lateinit var confirmButton: Button
 
-
-    private val listViewOptions: Array<String> = arrayOf("通用", "规则集", "支持库")
-
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         // 关闭
         closeButton.setOnAction { currentStage()?.close() }
@@ -80,11 +77,9 @@ class ConfigurationBaseController : Initializable {
     @FXML
     fun onMouseClicked() {
         val selectedItem = setOptionListView.selectionModel.selectedItem ?: return
-//        println("选中的设置项是$selectedItem")
         when (selectedItem) {
             "通用" -> {
                 showDetailPane("/com/dataway/page/view/Common.fxml")
-//                "/com/dataway/page/view/Common.fxml".let { showDetailPane(it) }
             }
             "规则集" -> {
                 showDetailPane("/com/dataway/page/view/RuleSet.fxml")
@@ -120,9 +115,8 @@ class ConfigurationBaseController : Initializable {
 
     //todo 后期实现文本框第一次点击时清空内容
 
-    //todo 取消应用确认接口
+    // 取消应用确认接口
     private fun doCancel(){
-        println("click cancel")
         val bottomAction = LeoContext.getValue(CURRENT_BOTTOM_ACTION) as BottomAction?
         bottomAction?.doCancel()
     }
@@ -133,7 +127,6 @@ class ConfigurationBaseController : Initializable {
     }
     //确认
     private fun doConfirm(){
-        println("click confirm")
         val bottomAction = LeoContext.getValue(CURRENT_BOTTOM_ACTION) as BottomAction?
         bottomAction?.doConfirm()
     }

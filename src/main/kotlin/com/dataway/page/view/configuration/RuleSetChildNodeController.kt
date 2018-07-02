@@ -100,7 +100,6 @@ class RuleSetChildNodeController : Initializable, BottomAction {
             }else{
                 optionList.add(splitList[0])
             }
-
         }
         optionList.add(0, "")
 
@@ -113,25 +112,6 @@ class RuleSetChildNodeController : Initializable, BottomAction {
         } else {
             showData()
         }
-
-
-        /*// 根据规则集名称查询配置文件,返回props对象
-
-        ruleSetProps.load(File("$configPath/$ruleSetName.props"))
-        val columns = ruleSetProps.getValue("$RULE_PREFIX.$ruleName.$RULE_COLUMN_NAMES")
-        val includeColumns = ruleSetProps.getValue("$RULE_PREFIX.$ruleName.$RULE_INCLUDE_COLUMNS")
-
-        //规则名称
-        ruleNameTextField.text = ruleName
-
-        //循环显示列数据tableView
-        convertColumnsToList(columns, includeColumns)
-
-        //初始化表格数据
-        initNormalTableView()
-        // 初始化交叉项表格
-        initCrossTableView()
-        // 根据规则名称查询生效关键字*/
 
         // 添加按钮初始化
         normalAddButton.setOnAction {
@@ -168,7 +148,6 @@ class RuleSetChildNodeController : Initializable, BottomAction {
                 it.addAll(crossRowList)
             }
         }
-
     }
 
     /**
@@ -192,7 +171,7 @@ class RuleSetChildNodeController : Initializable, BottomAction {
 
         //初始化表格数据
         initNormalTableView()
-        //todo 初始化交叉项表格
+        // 初始化交叉项表格
         initCrossTableView()
         showCrossTableView()
         //todo 根据规则名称查询生效关键字

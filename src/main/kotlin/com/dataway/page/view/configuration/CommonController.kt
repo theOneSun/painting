@@ -34,7 +34,7 @@ class CommonController : Initializable,BottomAction {
         //更改底部操作对象
         LeoContext.save(CURRENT_BOTTOM_ACTION,this)
 
-        //todo 从全局中读取输出目录,如过没有就设置为项目根目录,回车后修改
+        // 从全局中读取输出目录,如过没有就设置为项目根目录,回车后修改
         val value = LeoContext.getValue(TARGET_DIR)
         if (value == null) {
             LeoContext.save(TARGET_DIR, "/")
@@ -47,10 +47,10 @@ class CommonController : Initializable,BottomAction {
             }
         }
 
-        //todo 读取语料库列表
+        // 读取语料库列表
         corpusChoiceBox.items = FXCollections.observableArrayList("商业地产语料库", "XXX语料库", "AAA语料库")
 
-        //todo 合并本地语料库
+        // 合并本地语料库
         corpusButton.setOnMouseClicked { event ->
             if (event.button == MouseButton.PRIMARY)
                 println("合并本地语料库")
@@ -59,12 +59,7 @@ class CommonController : Initializable,BottomAction {
 
     override fun doCancel() {
         println("取消更改")
-        /*val alert = Alert(Alert.AlertType.CONFIRMATION)
-        alert.height = 500.0
-        alert.width = 400.0
-        alert.title = "取消"
-        alert.contentText = "hahahaha"
-        alert.show()*/
+        targetDirTextField.text = LeoContext.getValue(TARGET_DIR).toString()
     }
 
     override fun doSave() {
