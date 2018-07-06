@@ -217,41 +217,40 @@ class RuleSetParentNodeController : Initializable, BottomAction {
 //            val fileName = "${System.getProperty("user.dir")}/conf/$ruleSetName.props"
 
             //验证列名
-            println("验证列名$verifyColumn")
+
 
             //验证规则
 
             // 更新页面数据
             this.showData(ruleSetName)
         } else {
-
             // 新增 将所有数据保存到properties中并生成文件
-            val ruleSetFile = File(fileName)
-            if (ruleSetFile.exists()) {
-                //修改的名称已存在不可以修改
-                val errorDialog = DialogFactory.createErrorDialog(500.0, 400.0, "", "规则集名称已存在")
-                errorDialog.showAndWait()
+            if (StringUtils.isBlank(ruleSetName)) {
+                //规则集名称为空
+                DialogFactory.createErrorDialog("", "规则集名称不能为空").also { it.showAndWait() }
             } else {
-                println("新增可以存")
+                val ruleSetFile = File(fileName)
+                if (ruleSetFile.exists()) {
+                    //修改的名称已存在不可以修改
+                    val errorDialog = DialogFactory.createErrorDialog(500.0, 400.0, "", "规则集名称已存在")
+                    errorDialog.showAndWait()
+                } else {
+                    val props = Props()
+                    //验证列名
+                    props.setValue(RULE_SET_VERIFY_COLUMN, verifyColumn)
+                    //验证规则
+                    this.setVerifyRulesToProps(props)
+                    //todo 其他数据
+
+                    val orderedProperties = PropsUtils.convertOrderProperties(props)
+
+                    //存储的时候再转成props
+                    PropsConverter.convert(FileWriter(fileName), orderedProperties)
+                    // 更新树结构
+                    ruleSetController.loadTreeData()
+                }
             }
-            //规则集名称
-
-            val props = Props()
-            //验证列名
-            props.setValue(RULE_SET_VERIFY_COLUMN, verifyColumn)
-            //验证规则
-            this.setVerifyRulesToProps(props)
-            //todo 其他数据
-
-            val orderedProperties = PropsUtils.convertOrderProperties(props)
-
-            //存储的时候再转成props
-            PropsConverter.convert(FileWriter(fileName), orderedProperties)
         }
-
-        // 更新树结构
-        ruleSetController.loadTreeData()
-
     }
 
     /**
@@ -264,9 +263,12 @@ class RuleSetParentNodeController : Initializable, BottomAction {
             verifyRulesValue.append("${item.ruleName},")
         }
         //最后是逗号删除逗号
-        if (verifyRulesValue.lastIndexOf(",") == verifyRulesValue.length - 1) {
+        if (StringUtils.isNotBlank(verifyRulesValue) && verifyRulesValue.lastIndexOf(",") + 1 == verifyRulesValue.length) {
             verifyRulesValue.delete(verifyRulesValue.length - 1, verifyRulesValue.length)
         }
+        /*if (verifyRulesValue.lastIndexOf(",") + 1 == verifyRulesValue.length) {
+            verifyRulesValue.delete(verifyRulesValue.length - 1, verifyRulesValue.length)
+        }*/
         props.setValue(RULE_SET_VERIFY_RULES, verifyRulesValue.toString())
     }
 
